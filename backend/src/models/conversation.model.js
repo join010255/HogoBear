@@ -12,10 +12,7 @@ const Conversation = sequelize.define("Conversation", {
     user_one : {
         type : DataTypes.INTEGER,
         allowNull : false,
-        references : {
-            model : "Users",
-            key : "id"
-        }
+        
     },
     user_two : {
         type : DataTypes.INTEGER,

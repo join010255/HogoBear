@@ -11,20 +11,11 @@ const Friends =  sequelize.define("Friends", {
     user_id : {
         type : DataTypes.INTEGER,
         allowNull : false,
-        references:{
-            model : 'Users',
-            key : 'id'
-        }
     },
     friend_id : {
         type : DataTypes.INTEGER,
         allowNull : false,
-        references:{
-            model : 'Users',
-            key : 'id'
-        }
-    },
-    
+    } 
 },
 {  
     tableName : "Friends",

@@ -10,6 +10,8 @@
   "author": "",
   "type": "module",
   "dependencies": {
+    "@scure/base": "^2.3.0",
+    "@scure/bip39": "^2.3.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -17,7 +19,7 @@
     "libsodium-wrappers": "^0.8.4",
     "pg": "^8.22.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.8",
+    "sequelize": "^3.30.0",
     "socket.io": "^4.8.3",
     "zod": "^4.4.3"
   }
