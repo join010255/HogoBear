@@ -1,8 +1,21 @@
 import crypto from "crypto";
-import bcrypt
+import bcrypt from bcrypt
 
-const hashData = (data) => {
-    return crypto.createHash("sha256").update(data).digest("hex");
+
+class CryptoClass{
+  async hashData(data){
+      return await crypto.createHash("sha256").update(data).digest("hex");
+  }
+
+  async hashPasswordBcrypt(password){
+    return await bcrypt.hash(
+      password, 10
+    )
+  }
+  async comparePassword(password, hash) {
+    return await bcrypt.compare(password, hash);
+  }
 }
+  
 
-export default hashData;
+export default new CryptoClass();

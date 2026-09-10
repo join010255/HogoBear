@@ -12,6 +12,7 @@
   "dependencies": {
     "@scure/base": "^2.3.0",
     "@scure/bip39": "^2.4.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

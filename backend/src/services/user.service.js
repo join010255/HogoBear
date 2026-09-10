@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import generateVerificationToken from "../utils/token.js";
 import generateMnemonic from "../utils/bip.js";
 import { Op } from "sequelize";
-import hashData from "../utils/crypto.js";
+import CryptoClass from "../utils/crypto.js";
 
 class UserService {
     async createAccount(httpReq, httpRes) {
@@ -11,7 +11,7 @@ class UserService {
             let hashMnemonic = "";
             while(true){
                 hogoToken = await generateVerificationToken();
-                hashMnemonic = await hashData(generateMnemonic());
+                hashMnemonic = await CryptoClass.hashData(generateMnemonic());
                 const checkToken =  await User.findOne({
                     where : {
                         [Op.or]: [
@@ -25,7 +25,7 @@ class UserService {
                 }
             }
             await User.create({
-                password : hashData(httpReq.password),
+                password : CryptoClass.hashPasswordBcrypt(httpReq.password),
                 tokenUser : hogoToken,
                 recovery_accout_text : hashMnemonic
             });
@@ -55,7 +55,8 @@ class UserService {
                     message : "User not found"
                 });
             }
-            if(user.password !== httpReq.password){
+
+            if(!CryptoClass.comparePassword(httpReq.password, user.password)){
                 return httpRes.status(401).json({
                     message : "Invalid password"
                 });
@@ -74,3 +75,5 @@ class UserService {
         }
     }
 }
+
+export default new UserService();
