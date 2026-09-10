@@ -15,12 +15,12 @@ const Users = sequelize.define("Users", {
     },
     publicKey : {
         type : DataTypes.STRING,
+        defaultValue : null,
         unique : true,
-        allowNull : false
+        allowNull : true
     },
-    socketId : {
+    password : {
         type : DataTypes.STRING,
-        unique : true,
         allowNull : false
     },
     recovery_accout_text : {
