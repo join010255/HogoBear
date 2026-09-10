@@ -34,3 +34,4 @@ export const loginSchema = z.object({
         }).min(1, "Password cannot be empty"),
     }),
 });
+

@@ -9,6 +9,10 @@ class UserController {
     async login(httpReq, httpRes) {
         return await UserService.login(httpReq, httpRes);
     }
+
+    async updatePublicKeyUser(httpReq, httpRes) {
+        return await UserService.updatePublicKeyUser(httpReq, httpRes);
+    }
 }
 
 export default new UserController();
