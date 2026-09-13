@@ -1,5 +1,5 @@
 // Empty file
-import sequelize from "../config/database";
+import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
 
 const Users = sequelize.define("Users", {
@@ -13,10 +13,14 @@ const Users = sequelize.define("Users", {
         unique : true,
         allowNull : false
     },
+    username: {
+        type : DataTypes.STRING,
+        unique : true,
+        allowNull : false
+    },
     publicKey : {
         type : DataTypes.STRING,
         defaultValue : null,
-        unique : true,
         allowNull : true
     },
     password : {

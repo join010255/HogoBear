@@ -1,5 +1,5 @@
 // Empty file
-import sequelize from "../config/database";
+import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
 
 const Friends =  sequelize.define("Friends", {
@@ -15,7 +15,12 @@ const Friends =  sequelize.define("Friends", {
     friend_id : {
         type : DataTypes.INTEGER,
         allowNull : false,
-    } 
+    },
+    is_blocked : {
+        type : DataTypes.BOOLEAN,
+        defaultValue : false,
+        allowNull : false
+    }
 },
 {  
     tableName : "Friends",

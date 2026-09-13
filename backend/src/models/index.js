@@ -1,43 +1,52 @@
-// Empty file
-import Users from "./user.model";
-import Friends from "./friend.model";
-import Conversation from "./conversation.model";
+import Users from "./user.model.js";
+import Friends from "./friend.model.js";
+import Conversation from "./conversation.model.js";
 
+// ==================== FRIENDS ====================
 
-// hadi 5adi i traje3 mzyan
-
-// user wahed i 9dar i kono ando fzaf diyal frands
-Users.hasMany(Friends , {
-    foreignKey : "user_id"
-});
-
-// user wahed i 9dar i kon f howa frand and bzaf diyal diyale users
+// User -> friends records
 Users.hasMany(Friends, {
-    foreignKey : "friend_id"
+    foreignKey: "user_id",
+    as: "friends"
 });
 
-// kola frand rah mt3al9 b user_id ya3ni hta frand rah user bhad dato
+// User -> records where he is the friend
+Users.hasMany(Friends, {
+    foreignKey: "friend_id",
+    as: "friendOf"
+});
+
+// Friends -> user who created the friendship
 Friends.belongsTo(Users, {
-    foreignKey : "user_id"
+    foreignKey: "user_id",
+    as: "user"
 });
 
+// Friends -> actual friend
 Friends.belongsTo(Users, {
-    foreignKey : "friend_id"
+    foreignKey: "friend_id",
+    as: "friend"
 });
 
+
+// ==================== CONVERSATIONS ====================
 
 Users.hasMany(Conversation, {
-    foreignKey : "user_on"
-})
+    foreignKey: "user_on",
+    as: "conversationsAsUserOne"
+});
 
 Users.hasMany(Conversation, {
-    foreignKey : "user_two"
-})
+    foreignKey: "user_two",
+    as: "conversationsAsUserTwo"
+});
 
 Conversation.belongsTo(Users, {
-    foreignKey : "user_on"
-})
+    foreignKey: "user_on",
+    as: "userOne"
+});
 
 Conversation.belongsTo(Users, {
-    foreignKey : "user_two"
-})
+    foreignKey: "user_two",
+    as: "userTwo"
+});

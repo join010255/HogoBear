@@ -1,11 +1,14 @@
-import { generateMnemonic } from '@scure/bip39';
+import { webcrypto } from "node:crypto";
+import { generateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
 
-function generateMnemonic(){
-    const mnemonic = generateMnemonic(wordlist, 128);
-    return mnemonic;
+globalThis.crypto = webcrypto;
+
+function generateMnemonicc() {
+    return generateMnemonic(wordlist, 128);
 }
 
-// console.log(generateMnemonic())
+
+
 
 export default generateMnemonic;

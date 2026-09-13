@@ -4,9 +4,9 @@ import sequelize from "./config/database.js";
 import "./models/index.js";
 import userRouter from "./routes/user.routes.js";
 
+dotenv.config();
 
-
-const main = async() => {
+const main = async () => {
   const app = express();
 
   app.use(express.json());
@@ -16,18 +16,19 @@ const main = async() => {
     await sequelize.authenticate();
     console.log("Database connected");
 
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
 
     console.log("Tables are created");
   } catch (error) {
     console.error("Database error:", error);
+    return;
   }
 
-  server.listen(3000, () => {
-    console.log(`Server is running on port http://localhost:3000`);
+  app.listen(3000, () => {
+    console.log("Server is running on http://localhost:3000");
   });
-}
+};
 
-main().catch(err => {
+main().catch((err) => {
   console.error("Error:", err);
 });
