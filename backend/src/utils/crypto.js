@@ -7,13 +7,13 @@ class CryptoClass{
       return await crypto.createHash("sha256").update(data).digest("hex");
   }
 
-  async hashPasswordBcrypt(password){
-    return await bcrypt.hash(
+  hashPasswordBcrypt(password){
+    return bcrypt.hash(
       password, 10
     )
   }
-  async comparePassword(password, hash) {
-    return await bcrypt.compare(password, hash);
+  comparePassword(password, hash) {
+    return bcrypt.compare(password, hash);
   }
 }
   

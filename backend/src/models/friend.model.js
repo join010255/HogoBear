@@ -4,16 +4,16 @@ import { DataTypes } from "sequelize";
 
 const Friends =  sequelize.define("Friends", {
     id : {
+        type : DataTypes.UUID,
+        defaultValue : DataTypes.UUIDV4,
         primaryKey : true,
-        autoIncrement : true,
-        type : DataTypes.INTEGER,
     },
     user_id : {
-        type : DataTypes.INTEGER,
+        type : DataTypes.UUID,
         allowNull : false,
     },
     friend_id : {
-        type : DataTypes.INTEGER,
+        type : DataTypes.UUID,
         allowNull : false,
     },
     is_blocked : {

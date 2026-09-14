@@ -9,6 +9,7 @@ export const validate = (schema) => (req, res, next) => {
         });
         next();
     } catch (err) {
+        console.log(err)
         return res.status(400).json({
             message: "Validation error",
             errors: err.errors,
@@ -18,9 +19,12 @@ export const validate = (schema) => (req, res, next) => {
 
 export const createAccountSchema = z.object({
     body: z.object({
+        username: z.string({
+            required_error: "Username is required",
+        }).min(3, "Username must be at least 3 characters long"),
         password: z.string({
             required_error: "Password is required",
-        }).min(6, "Password must be at least 6 characters long"),
+        }).min(8, "Password must be at least 8 characters long"),
     }),
 });
 

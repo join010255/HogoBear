@@ -4,9 +4,9 @@ import { DataTypes } from "sequelize";
 
 const Users = sequelize.define("Users", {
     id : {
+        type : DataTypes.UUID,
+        defaultValue : DataTypes.UUIDV4,
         primaryKey : true,
-        autoIncrement : true,
-        type : DataTypes.INTEGER,
     },
     tokenUser : {
         type : DataTypes.STRING,

@@ -6,13 +6,28 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 class JWT {
-    async generateToken(payload) {
-        return jwt.sign(payload, JWT_SECRET, {
+    async generateToken(userData) {
+        const payload = {
+            id : userData.id,
+        }
+        const acessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: "1h"
         });
+        return acessToken;
     }
-    async verifyToken(token) {
-        return jwt.verify(token, process.env.JWT_SECRET);
+    async verifyToken(req) {
+        try {
+            const JWT_SECRET = process.env.JWT_SECRET;
+            
+            const header = req.headers.authorization;
+            if(!header.startsWith("Bearer ")){
+                return null;
+            }
+            const token = req.headers.authorization.split(" ")[1];
+            return jwt.verify(token, JWT_SECRET);
+        } catch (error) {
+            return null;
+        }
     }
 }
 

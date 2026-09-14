@@ -32,7 +32,7 @@ Friends.belongsTo(Users, {
 // ==================== CONVERSATIONS ====================
 
 Users.hasMany(Conversation, {
-    foreignKey: "user_on",
+    foreignKey: "user_one",
     as: "conversationsAsUserOne"
 });
 
@@ -42,7 +42,7 @@ Users.hasMany(Conversation, {
 });
 
 Conversation.belongsTo(Users, {
-    foreignKey: "user_on",
+    foreignKey: "user_one",
     as: "userOne"
 });
 
