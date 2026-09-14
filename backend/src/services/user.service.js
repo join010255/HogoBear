@@ -13,6 +13,8 @@ class UserService {
                     username : httpReq.body.username
                 }
             })
+            
+            console.log("labobob")
             if(userData){
                 return httpRes.status(400).json({
                     message : "Username already exists"
@@ -20,6 +22,7 @@ class UserService {
             }
             let hogoToken = "";
             let Mnemonic = "";
+
             while(true){
                
                 hogoToken = await generateVerificationToken();
@@ -37,14 +40,15 @@ class UserService {
                     break;
                 }
             }
-            console.log("lanonon")
+            
             await User.create({
                 password : await CryptoClass.hashPasswordBcrypt(httpReq.body.password),
                 tokenUser : hogoToken,
                 username : httpReq.body.username,
                 recovery_accout_text : await CryptoClass.hashData(Mnemonic)
             });
-            return httpRes.status(200).json({
+            
+            httpRes.status(200).json({
                 message : "Account created successfully",
                 data : {
                     tokenUser : hogoToken,
@@ -67,7 +71,7 @@ class UserService {
                     tokenUser : httpReq.body.tokenUser
                 }
             });
-            console.log(user)
+            // console.log(user)
             if(!user){
                 return httpRes.status(404).json({
                     message : "User not found"
@@ -79,12 +83,12 @@ class UserService {
                     message : "Invalid password"
                 });
             }
-            return httpRes.status(200).json({
+            httpRes.status(200).json({
                 message : "Login successfully",
                 data : {
                     tokenUser : user.tokenUser,
                     username : user.username,
-                    acessToken
+                    acessToken : await JWT.generateToken(user)
                 }
             });
         } catch (error) {

@@ -18,6 +18,7 @@ const main = async () => {
 
     await sequelize.sync();
 
+
     console.log("Tables are created");
   } catch (error) {
     console.error("Database error:", error);
