@@ -1,6 +1,6 @@
-import Users from "./user.model.js";
-import Friends from "./friend.model.js";
-import Conversation from "./conversation.model.js";
+import Users from "./users/user.model.js";
+import Friends from "./friends/friend.model.js";
+import Conversation from "./conversations/conversation.model.js";
 
 // ==================== FRIENDS ====================
 
@@ -50,3 +50,5 @@ Conversation.belongsTo(Users, {
     foreignKey: "user_two",
     as: "userTwo"
 });
+
+export { Users, Friends, Conversation };

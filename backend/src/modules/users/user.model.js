@@ -1,5 +1,5 @@
 // Empty file
-import sequelize from "../config/database.js";
+import sequelize from '../../config/database.js';
 import { DataTypes } from "sequelize";
 
 const Users = sequelize.define("Users", {

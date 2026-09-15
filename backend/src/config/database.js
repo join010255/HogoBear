@@ -1,9 +1,8 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
-dotenv.config({path : "../.env"});
-
-
+import path from "path";
+dotenv.config({path : path.join(import.meta.dirname, "../../.env")});
 const sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,

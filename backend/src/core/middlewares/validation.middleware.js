@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const validate = (schema) => (req, res, next) => {
     try {
+        console.log(req.body);
         schema.parse({
             body: req.body,
             query: req.query,
@@ -38,4 +39,3 @@ export const loginSchema = z.object({
         }).min(1, "Password cannot be empty"),
     }),
 });
-

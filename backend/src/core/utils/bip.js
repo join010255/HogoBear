@@ -8,7 +8,7 @@ if (!globalThis.crypto) {
     });
 }
 
-function generateMnemonicc() {
+function generateMnemonicWrapper() {
     return generateMnemonic(wordlist, 128);
 }
-export default generateMnemonicc;
+export default generateMnemonicWrapper;

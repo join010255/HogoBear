@@ -1,5 +1,5 @@
-import Friends from "../models/friend.model.js";
-import Users from "../models/user.model.js";
+import Friends from './friend.model.js';
+import Users from './user.model.js';
 
 
 class FriendService{

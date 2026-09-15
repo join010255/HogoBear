@@ -1,9 +1,9 @@
-import User from "../models/user.model.js";
-import generateVerificationToken from "../utils/token.js";
-import generateMnemonicc from "../utils/bip.js";
+import User from './user.model.js';
+import generateVerificationToken from "../../core/utils/token.js";
+import generateMnemonicWrapper from "../../core/utils/bip.js";
 import { Op } from "sequelize";
-import CryptoClass from "../utils/crypto.js";
-import JWT from "../utils/jwt.js";
+import CryptoClass from "../../core/utils/crypto.js";
+import JWT from "../../core/utils/jwt.js";
 
 class UserService {
     async createAccount(httpReq, httpRes) {
@@ -14,7 +14,6 @@ class UserService {
                 }
             })
             
-            console.log("labobob")
             if(userData){
                 return httpRes.status(400).json({
                     message : "Username already exists"
@@ -22,11 +21,11 @@ class UserService {
             }
             let hogoToken = "";
             let Mnemonic = "";
-
+            
             while(true){
                
                 hogoToken = await generateVerificationToken();
-                Mnemonic = await generateMnemonicc();
+                Mnemonic = await generateMnemonicWrapper();
                 const checkToken =  await User.findOne({
                     where : {
                         [Op.or]: [
@@ -40,7 +39,7 @@ class UserService {
                     break;
                 }
             }
-            
+            console.log(Mnemonic)
             await User.create({
                 password : await CryptoClass.hashPasswordBcrypt(httpReq.body.password),
                 tokenUser : hogoToken,
@@ -103,7 +102,7 @@ class UserService {
         try {
             const user = await User.findOne({
                 where : {
-                    tokenUser : httpReq.tokenUser
+                    tokenUser : httpReq.body.tokenUser
                 }
             });
             if(!user){
@@ -112,7 +111,7 @@ class UserService {
                 });
             }
             await user.update({
-                pubKeyUser : httpReq.pubKeyUser
+                publicKey : httpReq.body.publicKey
             });
             return httpRes.status(200).json({
                 message : "User updated successfully"
@@ -162,7 +161,7 @@ class UserService {
         try {
             const  userData = await User.findOne({
                 where : {
-                    tokenUser : httpReq.tokenUser
+                    tokenUser : httpReq.body.tokenUser
                 }
             });
             if(!userData){
