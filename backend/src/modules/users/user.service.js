@@ -110,6 +110,7 @@ class UserService {
                     message : "User not found"
                 });
             }
+            p
             await user.update({
                 publicKey : httpReq.body.publicKey
             });
