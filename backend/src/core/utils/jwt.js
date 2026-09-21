@@ -9,21 +9,16 @@ const JWT_SECRET = process.env.JWT_SECRET;
 class JWT {
     async generateToken(userData) {
         const payload = {
-            id : userData.id,
+            id: userData.id,
         }
         const acessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: "1h"
         });
         return acessToken;
     }
-    async verifyToken(req) {
+    async verifyToken(token) {
         try {
             const JWT_SECRET = process.env.JWT_SECRET;
-            const header = req.headers.authorization;
-            if(!header || !header.startsWith("Bearer ")){
-                return null;
-            }
-            const token = header.split(" ")[1];
             return jwt.verify(token, JWT_SECRET);
         } catch (error) {
             return null;

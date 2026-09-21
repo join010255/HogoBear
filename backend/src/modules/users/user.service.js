@@ -39,7 +39,6 @@ class UserService {
                     break;
                 }
             }
-            console.log(Mnemonic)
             await User.create({
                 password : await CryptoClass.hashPasswordBcrypt(httpReq.body.password),
                 tokenUser : hogoToken,

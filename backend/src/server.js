@@ -12,9 +12,9 @@ const main = async () => {
         await sequelize.authenticate();
         console.log("Database connected");
 
-        await sequelize.sync();
+        await sequelize.sync({alter : true});
 
-          app.listen(PORT, () => {
+        app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
 

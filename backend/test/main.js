@@ -1,10 +1,10 @@
-// import crypto from "crypto";
+import crypto from "crypto";
 
-// const generateVerificationToken = () => {
-//     return crypto.randomBytes(32).toString("hex");
-// }
+const generateVerificationToken = () => {
+    return crypto.randomBytes(32).toString("hex");
+}
 
-// export default generateVerificationToken;
+export default generateVerificationToken;
 
 
 
