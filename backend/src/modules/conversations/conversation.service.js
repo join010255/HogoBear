@@ -31,6 +31,41 @@ class ConversationService {
         }
     };
 
+    // create conversation
+    async deleteConversation(httpReq, httpRes) {
+        try {
+            const conversationID = httpReq.params.id;
+            
+            if (!conversationID) {
+                return httpRes.status(400).json({
+                    message: "Conversation ID is required"
+                });
+            }
+            
+            // Assuming Sequelize based on findByPk
+            const conversationData = await Conversation.findByPk(conversationID);
+            
+            if (!conversationData) {
+                return httpRes.status(404).json({
+                    message: "Conversation Not Found"
+                });
+            }
+            
+            // Use .destroy() instead of .delete() for Sequelize instances
+            await conversationData.destroy();
+
+            return httpRes.status(200).json({
+                message: "Conversation deleted successfully"
+            });
+
+        } catch (error) {
+            console.error("Error deleting conversation:", error);
+            return httpRes.status(500).json({
+                message: "Internal Server Error",
+                error: error.message
+            });
+        }
+    }
 }
 
 export default new ConversationService();
