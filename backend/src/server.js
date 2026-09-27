@@ -1,10 +1,18 @@
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// T3rif __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// St3ml __dirname hna
+dotenv.config({ path: path.join(__dirname, '../.env') }); 
+
 import sequelize from "./config/database.js";
 import "./modules/index.js";
 import app from "./app.js";
-import path from "path";
 
-dotenv.config({ path: path.join(import.meta.dirname, '../.env') }); 
 const PORT = process.env.PORT || 3000;
 
 const main = async () => {

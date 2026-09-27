@@ -1,0 +1,1 @@
+export function createRecoveryHint() { throw new Error("Recovery hint generation is not configured yet."); }

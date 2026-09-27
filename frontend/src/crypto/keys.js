@@ -1,0 +1,1 @@
+export async function generateKeyPair() { throw new Error("Key generation is not configured yet."); }

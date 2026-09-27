@@ -1,0 +1,1 @@
+export async function encryptMessage() { throw new Error("Message encryption is not configured yet."); }
