@@ -187,7 +187,36 @@ class UserService {
             });
 
         } catch (error) {
-            
+            return httpRes.status(500).json({
+                message : "Internal server error",
+                error : error
+            });
+        }
+    };
+    async getKeyPublic(httpReq, httpRes){
+        try {
+            const user = await User.findOne({
+                where : {
+                    tokenUser : httpReq.body.tokenUser
+                }
+            });
+            if(!user){
+                return httpRes.status(404).json({
+                    message : "User not found"
+                });
+            }
+            return httpRes.status(200).json({
+                message : "User found",
+                data : {
+                    publicKey : user.publicKey,
+                    tokenUser : user.tokenUser,
+                }
+            });
+        } catch (error) {
+            return httpRes.status(500).json({
+                message : "Internal server error",
+                error : error
+            });
         }
     }
 }

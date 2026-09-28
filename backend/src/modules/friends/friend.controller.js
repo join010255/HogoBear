@@ -13,5 +13,11 @@ class FriendController {
     async unblockFriend(httpReq, httpRes){
         await FriendService.unblockFriend(httpReq, httpRes);
     }
+    async acceptFriend(httpReq, httpRes){
+        await FriendService.acceptFriend(httpReq, httpRes);
+    }
+    async getFriendRequests(httpReq, httpRes){
+        await FriendService.getFriendRequests(httpReq, httpRes);
+    }
 }
 export default new FriendController();

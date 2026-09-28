@@ -1,10 +1,10 @@
-# HogoBear -- Final Project Specification
+# Raccoon Chat -- Final Project Specification
 
 # Phase 1 -- Project Overview
 
 ## Project Idea
 
-**HogoBear** is a secure, privacy-focused messaging application.
+**Raccoon Chat** is a secure, privacy-focused messaging application.
 
 The main goal of the project is to create a messaging platform where the
 **server acts only as a relay** between users. The server is responsible
@@ -109,12 +109,12 @@ Decrypt Message
 
 1.  User creates a local Password or PIN.
 2.  The app generates:
-    -   Hogo Token
+    -   Raccoon Token
     -   Public Key
     -   Private Key
 3.  The Private Key is encrypted locally.
 4.  The server stores only:
-    -   Hogo Token
+    -   Raccoon Token
     -   Public Key
 
 ------------------------------------------------------------------------
@@ -123,7 +123,7 @@ Decrypt Message
 
 1.  User enters the local password.
 2.  The app decrypts the Private Key.
-3.  The app connects using the stored Hogo Token.
+3.  The app connects using the stored Raccoon Token.
 
 ------------------------------------------------------------------------
 
