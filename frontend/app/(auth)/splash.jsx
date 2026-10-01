@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     gap: 16,
     marginTop: 50,
+    
   },
   bubbleWrapper: {
     width: '100%',

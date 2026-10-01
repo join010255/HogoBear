@@ -15,7 +15,7 @@ class UserService {
             })
             
             if(userData){
-                return httpRes.status(400).json({
+                return httpRes.status(409).json({
                     message : "Username already exists"
                 });
             }
@@ -109,7 +109,6 @@ class UserService {
                     message : "User not found"
                 });
             }
-            p
             await user.update({
                 publicKey : httpReq.body.publicKey
             });
