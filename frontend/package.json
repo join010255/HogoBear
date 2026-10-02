@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "axios": "^1.20.0",
     "expo": "~57.0.24",
+    "expo-clipboard": "~57.0.2",
     "expo-constants": "~57.0.19",
     "expo-linking": "~57.0.11",
     "expo-router": "~57.0.23",
@@ -15,7 +17,8 @@
     "react-native": "0.86.3",
     "react-native-safe-area-context": "5.10.0",
     "react-native-screens": "~4.28.0",
-    "socket.io-client": "^4.8.4"
+    "socket.io-client": "^4.8.4",
+    "zustand": "^5.0.15"
   },
   "scripts": {
     "start": "expo start",

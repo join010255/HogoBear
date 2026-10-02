@@ -13,6 +13,10 @@ class UserController {
     async updatePublicKeyUser(httpReq, httpRes) {
         return await UserService.updatePublicKeyUser(httpReq, httpRes);
     }
+
+    async refreshRecoveryText(httpReq, httpRes) {
+        return await UserService.refreshRecoveryText(httpReq, httpRes);
+    }
 }
 
 export default new UserController();

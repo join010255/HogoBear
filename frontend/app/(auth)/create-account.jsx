@@ -1,12 +1,14 @@
 import { ChevronLeft, User, KeyRound } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Input } from "../../src/components/common/Input";
-import { StyleSheet, View, Image, Text } from "react-native";
-import { TouchableOpacity } from "react-native"
+import { StyleSheet, View, Image, Text, TouchableOpacity, Modal } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Button1, Button2 } from "../../src/components/common/Button";
-import { usernameSchema, password } from "../../src/utils/validators";
+import { usernameSchema, password as passwordSchema } from "../../src/utils/validators";
+import { LogoutCard } from "../../src/components/common/Card"
+import createAccountStore from "../../src/store/authStore";
+import AuthApi from "../../src/api/auth.api"
 
 
 
@@ -18,24 +20,71 @@ const colors = {
 }
 
 export default function CreateAccountScreen() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] =  useState(null)
-  
+  const [showWarning, setShowWarning] = useState(false);
+
+  const { username, password, setAuthData, setAccountDetails } = createAccountStore();
+
+  const [isloading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState(null)
+  const [usernameError, setUsernameError] = useState(null)
+  const [passwordError, setPasswordError] = useState(null)
+
   const onchangeUsername = (e) => {
-    setUsername(e)
     const result = usernameSchema.safeParse({ username: e });
     if (!result.success) {
-      setError(result.error.issues[0].message);
+      setUsernameError(result.error.issues[0].message);
     } else {
-      setError(null);
+      setAuthData(e, password);
+      setUsernameError(null);
     }
   }
-  
+
+  const onChangePassword = (e) => {
+
+    const result = passwordSchema.safeParse({ password: e })
+    if (!result.success) {
+      setPasswordError(result.error.issues[0].message)
+    } else {
+      setAuthData(username, e);
+      setPasswordError(null)
+    }
+  }
+
+  const handelCreateAccount = async() => {
+    try {
+      setLoading(true);
+      setServerError(null);
+      setUsernameError(null);
+
+      const result = await AuthApi.createAccount({
+        username: username,
+        password: password
+      })
+      console.log(result.data.data)
+      
+      // Kan sauviw l'data f Zustand
+      setAccountDetails(result.data.data)
+      
+      // Kandiwh l'page dyal recovery
+      route.push("/recovery")
+      
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Failed to create account";
+      
+      if (errorMsg.toLowerCase().includes("username")) {
+        setUsernameError(errorMsg);
+      } else {
+        setServerError(errorMsg);
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const route = useRouter()
   return (
     <SafeAreaView style={style.screen}>
-      <TouchableOpacity style={style.logout} onPress={() => { route.replace("/splash") }}>
+      <TouchableOpacity style={style.logout} onPress={() => setShowWarning(true)}>
         <ChevronLeft size={35} color={colors.white} />
       </TouchableOpacity>
       <View style={style.logoSection}>
@@ -58,12 +107,12 @@ export default function CreateAccountScreen() {
           icon={<User size={22} color="#94A3B8" />}
           placeholder="Enter your display name"
           onChangeText={onchangeUsername}
-          hasError={Boolean(error)}
+          hasError={Boolean(usernameError)}
           returnKeyType="next"
         />
-        {error && (
-          <Text style={{color: "red"}}>
-            {error}
+        {usernameError && (
+          <Text style={{ color: "red", fontSize: 12 }}>
+            {usernameError}
           </Text>
         )}
 
@@ -71,22 +120,47 @@ export default function CreateAccountScreen() {
           label="Password"
           icon={<KeyRound size={22} color="#94A3B8" />}
           placeholder="Password"
-          onChangeText={(text) => { setPassword(text)}}
-          hasError={Boolean(error)}
+          onChangeText={onChangePassword}
+          hasError={Boolean(passwordError)}
           returnKeyType="done"
         />
-        {error && (
-          <Text style={{color: "red"}}>
-            {error}
+        {passwordError && (
+          <Text style={{ color: "red", fontSize: 12 }}>
+            {passwordError}
           </Text>
         )}
-        
-      </View>
-      
-      <View style={{ marginTop: 50, flex: 1}}>
-        <Button2 title={"Continue"} onPress={() => ''} />
+
       </View>
 
+      <View style={{ marginTop: 50, flex: 1 }}>
+        <Button2 title={"Continue"} onPress={() => {
+          if (usernameError || passwordError) {
+            return
+          }
+          if (!username) {
+            setUsernameError("can you write a username")
+          }
+          if (!password) {
+            setPasswordError("can you write a username")
+          } else {
+            handelCreateAccount()
+            // route.push("/recovery")
+          }
+        }} />
+      </View>
+
+      {/* {this modale is } */}
+      <Modal transparent={true} visible={showWarning} animationType="fade">
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
+          <LogoutCard
+            onLogout={() => {
+              setShowWarning(false);
+              route.replace("/splash");
+            }}
+            onCancel={() => setShowWarning(false)}
+          />
+        </View>
+      </Modal>
 
     </SafeAreaView>
   );
