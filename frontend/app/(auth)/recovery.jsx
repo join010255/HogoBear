@@ -244,7 +244,7 @@ export default function RecoveryScreen() {
           <View style={{width: 28}} />
         </View>
 
-        {/* Titles */}
+
         <View style={{marginTop: 20}}>
           <Text style={style.title}>Recovery Hint<Text style={{color: colors.muted}}>•</Text></Text>
           <Text style={style.description}>
@@ -252,7 +252,6 @@ export default function RecoveryScreen() {
           </Text>
         </View>
 
-        {/* Input Card */}
         <View style={style.inputCard}>
           <View style={style.inputHeader}>
             <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -291,30 +290,7 @@ export default function RecoveryScreen() {
           </View>
         </View>
 
-        {/* Tactical Inspirations */}
-        <View style={{marginTop: 30}}>
-          <Text style={style.sectionTitle}>TACTICAL INSPIRATIONS</Text>
-          <View style={style.chipsContainer}>
-            <TouchableOpacity style={style.chip}>
-              <BookOpen size={16} color={colors.muted} />
-              <Text style={style.chipText}>Favorite book quote</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={style.chip}>
-              <Car size={16} color={colors.muted} />
-              <Text style={style.chipText}>First road trip city</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={style.chip}>
-              <Hash size={16} color={colors.muted} />
-              <Text style={style.chipText}>Secret nickname</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={style.chip}>
-              <KeyRound size={16} color={colors.muted} />
-              <Text style={style.chipText}>First concert + cabin</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Guarantee Box */}
+      
         <View style={style.guaranteeBox}>
           <ShieldCheck size={24} color={colors.muted} style={{marginTop: 4}} />
           <View style={{flex: 1, marginLeft: 16}}>
@@ -325,8 +301,7 @@ export default function RecoveryScreen() {
           </View>
         </View>
 
-        {/* Footer Area */}
-        <View style={{marginTop: 'auto', paddingTop: 40}}>
+        <View style={{marginTop: 90}}>
           <View style={{marginBottom: 16}}>
             <Button2 title="Next" onPress={() => router.push("/home")} />
           </View>

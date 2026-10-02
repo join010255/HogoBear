@@ -62,10 +62,10 @@ export default function CreateAccountScreen() {
       })
       console.log(result.data.data)
       
-      // Kan sauviw l'data f Zustand
+      
       setAccountDetails(result.data.data)
       
-      // Kandiwh l'page dyal recovery
+
       route.push("/recovery")
       
     } catch (error) {
