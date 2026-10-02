@@ -244,7 +244,7 @@ export default function RecoveryScreen() {
           <View style={{width: 28}} />
         </View>
 
-
+        {/* Titles */}
         <View style={{marginTop: 20}}>
           <Text style={style.title}>Recovery Hint<Text style={{color: colors.muted}}>•</Text></Text>
           <Text style={style.description}>
@@ -252,6 +252,7 @@ export default function RecoveryScreen() {
           </Text>
         </View>
 
+        {/* Input Card */}
         <View style={style.inputCard}>
           <View style={style.inputHeader}>
             <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -290,7 +291,11 @@ export default function RecoveryScreen() {
           </View>
         </View>
 
-      
+        {/* Tactical Inspirations */}
+        
+    
+
+        {/* Guarantee Box */}
         <View style={style.guaranteeBox}>
           <ShieldCheck size={24} color={colors.muted} style={{marginTop: 4}} />
           <View style={{flex: 1, marginLeft: 16}}>
@@ -301,9 +306,9 @@ export default function RecoveryScreen() {
           </View>
         </View>
 
-        <View style={{marginTop: 90}}>
+        <View style={{marginTop: 'auto'}}>
           <View style={{marginBottom: 16}}>
-            <Button2 title="Next" onPress={() => router.push("/home")} />
+            <Button2 title="Next" onPress={() => router.push("/chats")} />
           </View>
           <Text style={style.footerText}>END-TO-END ENCRYPTED VAULT</Text>
         </View>
