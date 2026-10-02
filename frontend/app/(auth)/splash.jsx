@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import UserStore from "../../src/store/userStore";
 
-
 const colors = {
   primary: "#FFFFFF",
   secondary: "#1C1C1C",
@@ -23,7 +22,13 @@ export default function SplashScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    
+    async function checkUser() {
+      const user = await UserStore.getUser();
+      if (user) {
+        console.log('user found in secure store');
+      }
+    }
+    checkUser();
   }, []);
 
   return (

@@ -7,6 +7,7 @@ export function Input({
   icon: Icon, 
   containerStyle, 
   inputStyle,
+  hasError = false,
   ...props 
 }) {
   return (
@@ -18,8 +19,7 @@ export function Input({
         </View>
       )}
 
-      {/* Input Box */}
-      <View style={styles.inputWrapper}>
+      <View style={[styles.inputWrapper, hasError && styles.inputWrapperError]}>
         {Icon && (
           <View style={styles.iconContainer}>
             {Icon}
@@ -65,6 +65,10 @@ const styles = StyleSheet.create({
     borderRadius: 20, // Large rounded corners
     minHeight: 60,
     paddingHorizontal: 20,
+  },
+  inputWrapperError: {
+    borderColor: "#EF4444",
+    borderWidth: 1,
   },
   iconContainer: {
     marginRight: 4,

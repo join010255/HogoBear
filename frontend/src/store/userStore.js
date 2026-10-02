@@ -12,6 +12,7 @@ class UserStore {
             
         }      
     }
+    
     async setUser(token){
         try{
             await SecureStore.setItemAsync("userToken", JSON.stringify(token));
@@ -19,7 +20,8 @@ class UserStore {
         }catch(error){
             console.error(error);
         }  
-    }   
+    } 
+
     async removeUser(){
         try{
             await SecureStore.deleteItemAsync("userToken");
@@ -30,4 +32,4 @@ class UserStore {
         }  
     }   
 }
-export const userStore = new UserStore();
+export default new UserStore();

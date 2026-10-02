@@ -6,6 +6,8 @@ import { TouchableOpacity } from "react-native"
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Button1, Button2 } from "../../src/components/common/Button";
+import { usernameSchema, password } from "../../src/utils/validators";
+
 
 
 const colors = {
@@ -16,9 +18,19 @@ const colors = {
 }
 
 export default function CreateAccountScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setpassword] = useState("");
-
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] =  useState(null)
+  
+  const onchangeUsername = (e) => {
+    setUsername(e)
+    const result = usernameSchema.safeParse({ username: e });
+    if (!result.success) {
+      setError(result.error.issues[0].message);
+    } else {
+      setError(null);
+    }
+  }
   
   const route = useRouter()
   return (
@@ -45,19 +57,32 @@ export default function CreateAccountScreen() {
           label="Username"
           icon={<User size={22} color="#94A3B8" />}
           placeholder="Enter your display name"
-          onChangeText={(text) => { setEmail(text) }}
+          onChangeText={onchangeUsername}
+          hasError={Boolean(error)}
           returnKeyType="next"
         />
+        {error && (
+          <Text style={{color: "red"}}>
+            {error}
+          </Text>
+        )}
 
         <Input
           label="Password"
           icon={<KeyRound size={22} color="#94A3B8" />}
           placeholder="Password"
-          onChangeText={(password) => { setpassword(password) }}
+          onChangeText={(text) => { setPassword(text)}}
+          hasError={Boolean(error)}
           returnKeyType="done"
         />
+        {error && (
+          <Text style={{color: "red"}}>
+            {error}
+          </Text>
+        )}
         
       </View>
+      
       <View style={{ marginTop: 50, flex: 1}}>
         <Button2 title={"Continue"} onPress={() => ''} />
       </View>
