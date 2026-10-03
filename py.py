@@ -12,7 +12,7 @@ public_key_B = private_key_B.public_key()
 shared_secret_A = private_key_A.exchange(public_key_B)
 shared_secret_B = private_key_B.exchange(public_key_A)
 
-print(shared_secret_A.hex())
-print(shared_secret_B.hex())
+print(shared_secret_A)
+print(shared_secret_B)
 
 print(shared_secret_A == shared_secret_B)
