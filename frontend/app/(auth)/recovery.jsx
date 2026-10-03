@@ -230,10 +230,12 @@ export default function RecoveryScreen() {
 
   const handleNext = async () => {
     const result = await AuthApi.login(tokenUser, password);
-    console.log(result.data);
+
     if (result.data) {
+
       // Store the token securely and navigate to the main app
-      await UserStore.setData(result.data.acessToken);
+      await UserStore.setData(result.data.data.acessToken);
+      
       router.replace("/(main)/chats");
     } else {
       Alert.alert("Error", "Failed to log in with the provided credentials.");
