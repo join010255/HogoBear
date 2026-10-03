@@ -10,7 +10,13 @@ class AuthApi {
             throw error;
         }
     }
-
+    async login(tokenUser, password) {
+        try {
+            return await api.post("/users/login", {tokenUser, password});
+        } catch (error) {
+            throw error;
+        }
+    }
     async refreshRecoveryText(tokenUser, password) {
         try {
             return await api.post("/users/refresh-recovery", { tokenUser, password });

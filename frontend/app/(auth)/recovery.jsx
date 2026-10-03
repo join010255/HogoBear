@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import * as Clipboard from 'expo-clipboard';
 import { Button2 } from "../../src/components/common/Button";
 import AuthApi from "../../src/api/auth.api";
+import UserStore from "../../src/store/userStore";
 
 const colors = {
   background: "#0A0A0A",
@@ -220,9 +221,22 @@ export default function RecoveryScreen() {
       const result = await AuthApi.refreshRecoveryText(tokenUser, password);
       setAccountDetails(result.data.data);
     } catch (error) {
+      console.log(error)
       Alert.alert("Error", "Failed to refresh recovery text");
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  const handleNext = async () => {
+    const result = await AuthApi.login(tokenUser, password);
+    console.log(result.data);
+    if (result.data) {
+      // Store the token securely and navigate to the main app
+      await UserStore.setData(result.data.acessToken);
+      router.replace("/(main)/chats");
+    } else {
+      Alert.alert("Error", "Failed to log in with the provided credentials.");
     }
   };
 
@@ -308,7 +322,7 @@ export default function RecoveryScreen() {
 
         <View style={{marginTop: 'auto'}}>
           <View style={{marginBottom: 16}}>
-            <Button2 title="Next" onPress={() => router.push("/chats")} />
+            <Button2 title="Next" onPress={handleNext} />
           </View>
           <Text style={style.footerText}>END-TO-END ENCRYPTED VAULT</Text>
         </View>

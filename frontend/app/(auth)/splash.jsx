@@ -23,9 +23,10 @@ export default function SplashScreen() {
 
   useEffect(() => {
     async function checkUser() {
-      const user = await UserStore.getUser();
+      const user = await UserStore.getData();
       if (user) {
         console.log('user found in secure store');
+        router.replace("/(main)/chats");
       }
     }
     checkUser();

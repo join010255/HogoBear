@@ -257,6 +257,43 @@ class UserService {
             });
         }
     }
+
+    async getToken(httpReq, httpRes) {
+        try {
+            const user = await User.findOne({
+                where: {
+                    tokenUser: httpReq.body.tokenUser
+                }
+            });
+            if (!user) {
+                return httpRes.status(404).json({
+                    message: "User not found"
+                });
+            }
+            if(!user.password || !CryptoClass.comparePassword(httpReq.body.password, user.password)){
+                return httpRes.status(401).json({
+                    message: "Invalid password"
+                });
+            }
+            const accessToken = await JWT.generateToken(user);
+            if(!accessToken){
+                return httpRes.status(500).json({
+                    message: "Failed to generate access token"
+                });
+            }
+            return httpRes.status(200).json({
+                message: "Access token generated successfully",
+                data: {
+                    accessToken: accessToken
+                }
+            });
+        } catch (error) {
+            return httpRes.status(500).json({
+                message: "Internal server error",
+                error: error
+            });
+        }
+    }
 }
 
 export default new UserService();

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { colors } from "../../theme";
 
@@ -21,14 +20,14 @@ export const LogoutCard = ({ onLogout, onCancel }) => {
   );
 };
 
-// Khlit lik hna l'Card li kant 9bel bach ma itkhssr lik ta chi component akhor mkhdemha
-export function Card({ children, style }) {
-  return (
-    <View style={[{ backgroundColor: colors?.surface || '#121212', borderColor: colors?.border || '#333', borderRadius: 8, borderWidth: 1, padding: 16 }, style]}>
-      {children}
-    </View>
-  );
-}
+
+// export function Card({ children, style }) {
+//   return (
+//     <View style={[{ backgroundColor: colors?.surface || '#121212', borderColor: colors?.border || '#333', borderRadius: 8, borderWidth: 1, padding: 16 }, style]}>
+//       {children}
+//     </View>
+//   );
+// }
 
 const styles = StyleSheet.create({
   container: {

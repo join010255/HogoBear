@@ -17,6 +17,9 @@ class UserController {
     async refreshRecoveryText(httpReq, httpRes) {
         return await UserService.refreshRecoveryText(httpReq, httpRes);
     }
+    async getToken(httpReq, httpRes) {
+        return await UserService.getToken(httpReq, httpRes);
+    }
 }
 
 export default new UserController();

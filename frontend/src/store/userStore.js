@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 
 class UserStore {
-    async getUser() {
+    async getData() {
         try{
             const userToken = await SecureStore.getItemAsync("userToken");
             if(userToken){
@@ -13,7 +13,7 @@ class UserStore {
         }      
     }
     
-    async setUser(token){
+    async setData(token){
         try{
             await SecureStore.setItemAsync("userToken", JSON.stringify(token));
             return true;
@@ -22,7 +22,7 @@ class UserStore {
         }  
     } 
 
-    async removeUser(){
+    async ramoveData(){
         try{
             await SecureStore.deleteItemAsync("userToken");
             return true;

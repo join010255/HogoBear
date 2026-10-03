@@ -142,9 +142,10 @@ export default function CreateAccountScreen() {
           }
           if (!password) {
             setPasswordError("can you write a username")
-          } else {
+          }
+          if(!usernameError && !passwordError && username && password) {
             handelCreateAccount()
-            // route.push("/recovery")
+            route.push("/recovery")
           }
         }} />
       </View>
