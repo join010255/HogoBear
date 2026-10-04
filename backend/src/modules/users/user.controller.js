@@ -3,22 +3,28 @@ import UserService from './user.service.js';
 
 class UserController {
     async createAccount(httpReq, httpRes) {
-        return await UserService.createAccount(httpReq, httpRes);
+        try{
+            await UserService.createAccount(httpReq, httpRes);
+        }catch(error){
+            httpRes.status(500).json({
+                message: "Server Error"
+            })
+        }
     }
 
     async login(httpReq, httpRes) {
-        return await UserService.login(httpReq, httpRes);
+        await UserService.login(httpReq, httpRes);
     }
 
     async updatePublicKeyUser(httpReq, httpRes) {
-        return await UserService.updatePublicKeyUser(httpReq, httpRes);
+        await UserService.updatePublicKeyUser(httpReq, httpRes);
     }
 
     async refreshRecoveryText(httpReq, httpRes) {
-        return await UserService.refreshRecoveryText(httpReq, httpRes);
+        await UserService.refreshRecoveryText(httpReq, httpRes);
     }
     async getToken(httpReq, httpRes) {
-        return await UserService.getToken(httpReq, httpRes);
+        await UserService.getToken(httpReq, httpRes);
     }
 }
 
