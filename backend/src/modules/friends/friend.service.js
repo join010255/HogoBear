@@ -11,7 +11,8 @@ class FriendService {
             const userId = httpReq.user.id;
             const allUserFriends = await Friends.findAll({
                 where: {
-                    user_id: userId
+                    user_id: userId,
+                    status: "ACCEPTED"
                 },
                 include: [
                     {
@@ -108,20 +109,89 @@ class FriendService {
             
             await Friends.create({
                 user_id: userToken,
-                friend_id: friendData.id
-            });
-            // create conversation when add friend
-            await Conversation.create({
-                user_one: userToken,
-                user_two: friendData.id,
+                friend_id: friendData.id,
+                status: "PENDING"
             });
             return httpRes.status(200).json({
-                message: "Friend added successfully"
+                message: "Friend request sent successfully"
             });
         } catch (error) {
             return httpRes.status(500).json({
                 error: "Internal server error"
             });
+        }
+    }
+
+    async acceptFriend(httpReq, httpRes) {
+        try {
+            const friendData = await Users.findOne({
+                where: {
+                    tokenUser: httpReq.body.friend_token
+                }
+            });
+            if (!friendData) {
+                return httpRes.status(404).json({ error: "User not found" });
+            }
+
+            const userId = httpReq.user.id;
+            
+            // The friend request was sent by friendData.id TO userId
+            const friendRequest = await Friends.findOne({
+                where: {
+                    user_id: friendData.id,
+                    friend_id: userId,
+                    status: "PENDING"
+                }
+            });
+
+            if (!friendRequest) {
+                return httpRes.status(404).json({ error: "Friend request not found" });
+            }
+
+            friendRequest.status = "ACCEPTED";
+            await friendRequest.save();
+
+            // create reverse friendship for easier querying, or just rely on one record
+            // since getFriends only checks user_id, let's create the reverse record
+            await Friends.create({
+                user_id: userId,
+                friend_id: friendData.id,
+                status: "ACCEPTED"
+            });
+
+            // create conversation when request is accepted
+            await Conversation.create({
+                user_one: friendData.id,
+                user_two: userId,
+            });
+
+            return httpRes.status(200).json({ message: "Friend request accepted and conversation started" });
+        } catch (error) {
+            console.error(error);
+            return httpRes.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    async getFriendRequests(httpReq, httpRes) {
+        try {
+            const userId = httpReq.user.id;
+            const requests = await Friends.findAll({
+                where: {
+                    friend_id: userId,
+                    status: "PENDING"
+                },
+                include: [
+                    {
+                        model: Users,
+                        as: "user", // we need the user who sent the request. Wait, does friend.model have an alias for user_id?
+                    }
+                ]
+            });
+            
+            return httpRes.status(200).json({ data: requests });
+        } catch (error) {
+            console.error(error);
+            return httpRes.status(500).json({ error: "Internal server error" });
         }
     }
 }

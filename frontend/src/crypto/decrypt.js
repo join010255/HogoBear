@@ -1,0 +1,1 @@
+export async function decryptMessage() { throw new Error("Message decryption is not configured yet."); }

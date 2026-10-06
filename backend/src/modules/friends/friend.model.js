@@ -20,6 +20,11 @@ const Friends =  sequelize.define("Friends", {
         type : DataTypes.BOOLEAN,
         defaultValue : false,
         allowNull : false
+    },
+    status : {
+        type : DataTypes.ENUM("PENDING", "ACCEPTED", "REJECTED"),
+        defaultValue : "PENDING",
+        allowNull : false
     }
 },
 {  
