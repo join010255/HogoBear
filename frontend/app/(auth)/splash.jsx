@@ -23,9 +23,11 @@ export default function SplashScreen() {
 
   useEffect(() => {
     async function checkUser() {
-      const user = await UserStore.getData();
+      const user = await UserStore.getData("userToken");
       if (user) {
+
         router.replace("/(main)/chats");
+
       }
     }
     checkUser();
@@ -86,7 +88,7 @@ export default function SplashScreen() {
           <Text style={styles.secondaryButtonText}>I have an account</Text>
         </TouchableOpacity>
       </View>
-      <View style={{alignItems: "center", marginBottom: "5%"}}>
+      <View style={{ alignItems: "center", marginBottom: "5%" }}>
         <Text style={{ color: "white", fontSize: 12, marginTop: "2%" }}>
           By using this using, you agree to our Terms of Service and Privacy Policy.
         </Text>
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     gap: 16,
     marginTop: 50,
-    
+
   },
   bubbleWrapper: {
     width: '100%',

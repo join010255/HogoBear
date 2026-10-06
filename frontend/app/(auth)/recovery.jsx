@@ -108,7 +108,7 @@ const style = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.white, 
+    backgroundColor: colors.white,
     marginRight: 8
   },
   optimalText: {
@@ -201,10 +201,10 @@ export default function RecoveryScreen() {
   }, [recovery_accout_text]);
 
   const copyToClipboard = async () => {
-    if(hint) {
+    if (hint) {
       await Clipboard.setStringAsync(hint);
       setHasCopied(true);
-      
+
       // Raj3o l'icone d Copy mn b3d 3 tawan
       setTimeout(() => {
         setHasCopied(false);
@@ -213,7 +213,7 @@ export default function RecoveryScreen() {
   };
 
   const handleRefresh = async () => {
-    if(!tokenUser || !password){
+    if (!tokenUser || !password) {
       return
     };
     try {
@@ -221,7 +221,6 @@ export default function RecoveryScreen() {
       const result = await AuthApi.refreshRecoveryText(tokenUser, password);
       setAccountDetails(result.data.data);
     } catch (error) {
-      console.log(error)
       Alert.alert("Error", "Failed to refresh recovery text");
     } finally {
       setIsRefreshing(false);
@@ -234,8 +233,8 @@ export default function RecoveryScreen() {
     if (result.data) {
 
       // Store the token securely and navigate to the main app
-      await UserStore.setData(result.data.data.acessToken);
-      
+      await UserStore.setData("userToken", result.data.data.acessToken);
+
       router.replace("/(main)/chats");
     } else {
       Alert.alert("Error", "Failed to log in with the provided credentials.");
@@ -244,25 +243,25 @@ export default function RecoveryScreen() {
 
   return (
     <SafeAreaView style={style.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{flexGrow: 1}}>
-        
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+
         {/* Header */}
         <View style={style.header}>
           <TouchableOpacity onPress={() => router.back()} style={style.backBtn}>
             <ChevronLeft size={28} color={colors.white} />
           </TouchableOpacity>
-          
+
           <View style={style.badge}>
-            <Lock size={14} color={colors.white} style={{marginRight: 6}} />
+            <Lock size={14} color={colors.white} style={{ marginRight: 6 }} />
             <Text style={style.badgeText}>{username}</Text>
           </View>
-          
-          <View style={{width: 28}} />
+
+          <View style={{ width: 28 }} />
         </View>
 
         {/* Titles */}
-        <View style={{marginTop: 20}}>
-          <Text style={style.title}>Recovery Hint<Text style={{color: colors.muted}}>•</Text></Text>
+        <View style={{ marginTop: 20 }}>
+          <Text style={style.title}>Recovery Hint<Text style={{ color: colors.muted }}>•</Text></Text>
           <Text style={style.description}>
             Set a zero-knowledge mnemonic hint to trigger your local password recall. Because Raccoon Chat never stores your credentials, this encrypted hint is your only fallback.
           </Text>
@@ -271,14 +270,14 @@ export default function RecoveryScreen() {
         {/* Input Card */}
         <View style={style.inputCard}>
           <View style={style.inputHeader}>
-            <View style={{flexDirection: "row", alignItems: "center"}}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <HelpCircle size={14} color={colors.muted} />
               <Text style={style.inputLabel}>PERSONAL MNEMONIC KEY</Text>
             </View>
             <Text style={style.charCount}>{hint.length} / 120</Text>
           </View>
-          
-          <TextInput 
+
+          <TextInput
             style={style.input}
             multiline
             value={hint}
@@ -286,17 +285,17 @@ export default function RecoveryScreen() {
             placeholder="No hint generated."
             placeholderTextColor={colors.muted}
           />
-          
+
           <View style={style.inputFooter}>
-            <View style={{flexDirection: "row", alignItems: "center"}}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View style={style.greenDot} />
               <Text style={style.optimalText}>Optimal Mnemonic</Text>
             </View>
-            <View style={{flexDirection: "row"}}>
-              <TouchableOpacity onPress={handleRefresh} disabled={isRefreshing} style={{padding: 4, marginRight: 8, opacity: isRefreshing ? 0.5 : 1}}>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity onPress={handleRefresh} disabled={isRefreshing} style={{ padding: 4, marginRight: 8, opacity: isRefreshing ? 0.5 : 1 }}>
                 <RefreshCw size={20} color={colors.muted} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={copyToClipboard} style={{padding: 4}}>
+              <TouchableOpacity onPress={copyToClipboard} style={{ padding: 4 }}>
                 {hasCopied ? (
                   <Check size={20} color="#6EE7B7" />
                 ) : (
@@ -308,13 +307,13 @@ export default function RecoveryScreen() {
         </View>
 
         {/* Tactical Inspirations */}
-        
-    
+
+
 
         {/* Guarantee Box */}
         <View style={style.guaranteeBox}>
-          <ShieldCheck size={24} color={colors.muted} style={{marginTop: 4}} />
-          <View style={{flex: 1, marginLeft: 16}}>
+          <ShieldCheck size={24} color={colors.muted} style={{ marginTop: 4 }} />
+          <View style={{ flex: 1, marginLeft: 16 }}>
             <Text style={style.guaranteeTitle}>Zero-Knowledge Guarantee</Text>
             <Text style={style.guaranteeDesc}>
               Never include your actual password or raw master key in this hint. Anyone with physical access to your device could trigger this reminder.
@@ -322,8 +321,8 @@ export default function RecoveryScreen() {
           </View>
         </View>
 
-        <View style={{marginTop: 'auto'}}>
-          <View style={{marginBottom: 16}}>
+        <View style={{ marginTop: 'auto' }}>
+          <View style={{ marginBottom: 16 }}>
             <Button2 title="Next" onPress={handleNext} />
           </View>
           <Text style={style.footerText}>END-TO-END ENCRYPTED VAULT</Text>

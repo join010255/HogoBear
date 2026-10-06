@@ -10,7 +10,11 @@ export default function MainLayout() {
       tabBarActiveTintColor: colors.accent,
       tabBarInactiveTintColor: colors.muted,
     }}>
-      <Tabs.Screen name="chats" options={{ title: "Chats", headerShown: false }} />
+      <Tabs.Screen name="chats" options={{ 
+        title: "Chats", 
+        headerShown: false,
+        tabBarStyle: { display: "none" }
+      }} />
       <Tabs.Screen name="friends" options={{ title: "Friends", headerShown: false }} />
       <Tabs.Screen name="profile" options={{ title: "Profile", headerShown: false }} />
     </Tabs>

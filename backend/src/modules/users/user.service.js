@@ -4,6 +4,8 @@ import generateMnemonicWrapper from "../../core/utils/bip.js";
 import { Op } from "sequelize";
 import CryptoClass from "../../core/utils/crypto.js";
 import JWT from "../../core/utils/jwt.js";
+import Conversation from "../conversations/conversation.model.js";
+import Friends from "../friends/friend.model.js";
 
 class UserService {
     async createAccount(httpReq, httpRes) {
@@ -291,6 +293,65 @@ class UserService {
             return httpRes.status(500).json({
                 message: "Internal server error",
                 error: error
+            });
+        }
+    };
+
+    async tokenVerify(httpReq, httpRes){
+        try {
+            const userId = httpReq.user.id;
+            
+            const user = await User.findOne({
+                where: { id: userId },
+                attributes: ["id", "username", "tokenUser"] // Exclude sensitive info if needed
+            });
+            
+            if (!user) {
+                return httpRes.status(404).json({
+                    message: "User not found"
+                });
+            }
+            
+            // Fetch conversations for the user
+            const conversations = await Conversation.findAll({
+                where: {
+                    [Op.or]: [
+                        { user_one: userId }
+                        // You can add { user_two: userId } here if applicable in your model
+                    ]
+                }, 
+                include : {
+                    model: User,
+                    as: "userTwo", // Make sure this matches your model association
+                    attributes: ["tokenUser", "username"]
+                }
+            });
+
+            // Fetch friends for the user
+            const friends = await Friends.findAll({
+                where: {
+                    user_id: userId,
+                    status: "ACCEPTED"
+                },
+                include: [
+                    {
+                        model: User,
+                        as: "friend",
+                        attributes: ["tokenUser", "username"]
+                    }
+                ]
+            });
+
+            return httpRes.status(200).json({
+                message: "Token verified successfully",
+                user: user,
+                conversations: conversations,
+                friends: friends
+            });
+        } catch (error) {
+            return httpRes.status(500).json({
+                message: "Internal server error during verification",
+                error: error.message
             });
         }
     }

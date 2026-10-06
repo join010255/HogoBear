@@ -12,6 +12,7 @@ export const requireAuth = async (req, res, next) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
         req.user = decoded; // Contains id
+        req.body.user = decoded;
         next();
     } catch (error) {
         return res.status(401).json({

@@ -115,14 +115,13 @@ export default function ChatsScreen() {
           </View>
         </View>
         <View style={style.headerRight}>
+
           <TouchableOpacity style={style.iconButton}>
             <Search color={colors.smoletext} size={22} />
           </TouchableOpacity>
+          
           <TouchableOpacity style={style.iconButton}>
             <Settings color={colors.smoletext} size={22} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image source={{ uri: 'https://i.pravatar.cc/150?img=11' }} style={style.avatarSmall} />
           </TouchableOpacity>
         </View>
       </View>
@@ -173,7 +172,7 @@ export default function ChatsScreen() {
           </View>
         </View>
 
-        {/* Chat List */}
+        
         <View style={style.chatListContainer}>
           {chatData.map((item) => (
             <React.Fragment key={item.id}>
@@ -181,12 +180,11 @@ export default function ChatsScreen() {
             </React.Fragment>
           ))}
         </View>
+        
       </ScrollView>
-
-      {/* FAB */}
       <TouchableOpacity style={style.fab}>
-        <Plus color={colors.background} size={20} style={style.fabIcon} />
-        <Text style={style.fabText}>Add Friend</Text>
+          <Plus color={colors.background} size={20} style={style.fabIcon} />
+          <Text style={style.fabText}>Add Friend</Text>
       </TouchableOpacity>
     </SafeAreaView>
   )
@@ -196,6 +194,8 @@ const style = StyleSheet.create({
   screen: {
     backgroundColor: colors.background,
     flex: 1,
+    paddingHorizontal : 5,
+    paddingVertical : 5
   },
   header: {
     flexDirection: 'row',
@@ -411,15 +411,14 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
   },
   fab: {
-    position: 'absolute',
-    bottom: 24,
     alignSelf: 'center',
     backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    bottom: 53,
     borderRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

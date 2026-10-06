@@ -133,7 +133,7 @@ export default function CreateAccountScreen() {
       </View>
 
       <View style={{ marginTop: 50, flex: 1 }}>
-        <Button2 title={"Continue"} onPress={() => {
+        <Button2 title={"Continue"} onPress={async () => {
           if (usernameError || passwordError) {
             return
           }
@@ -144,7 +144,7 @@ export default function CreateAccountScreen() {
             setPasswordError("can you write a username")
           }
           if(!usernameError && !passwordError && username && password) {
-            handelCreateAccount()
+            await handelCreateAccount()
             route.push("/recovery")
           }
         }} />

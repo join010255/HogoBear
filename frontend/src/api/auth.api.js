@@ -27,6 +27,14 @@ class AuthApi {
             throw error;
         }
     }
+    
+    async verifyToken() {
+        try {
+            return await api.get("/users/verify-token");
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default new AuthApi();

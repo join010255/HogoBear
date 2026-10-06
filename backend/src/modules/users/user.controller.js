@@ -26,6 +26,9 @@ class UserController {
     async getToken(httpReq, httpRes) {
         await UserService.getToken(httpReq, httpRes);
     }
+    async tokenVerify(httpReq, httpRes) {
+        await UserService.tokenVerify(httpReq, httpRes);
+    }
 }
 
 export default new UserController();
