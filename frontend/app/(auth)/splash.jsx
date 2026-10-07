@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import UserStore from "../../src/store/userStore";
+import AuthApi from "../../src/api/auth.api";
+import { useAuthStore } from "../../src/store/authStore";
 
 const colors = {
   primary: "#FFFFFF",
@@ -20,14 +22,20 @@ const MOCK_MESSAGES = [
 
 export default function SplashScreen() {
   const router = useRouter();
+  const setVerifyData = useAuthStore((state) => state.setVerifyData);
 
   useEffect(() => {
     async function checkUser() {
       const user = await UserStore.getData("userToken");
       if (user) {
-
-        router.replace("/(main)/chats");
-
+        try {
+          const response = await AuthApi.verifyToken();
+          setVerifyData(response.data);
+          router.replace("/(main)/chats");
+        } catch (error) {
+          console.log("Token verification failed or expired, clearing session.");
+          await UserStore.ramoveData("userToken");
+        }
       }
     }
     checkUser();

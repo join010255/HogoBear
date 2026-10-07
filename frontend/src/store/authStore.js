@@ -1,7 +1,7 @@
 import * as zustand from "zustand";
 
 
-const createAccountStore = zustand.create((set) => ({
+export const createAccountStore = zustand.create((set) => ({
     username: "",
     password : "",
     tokenUser: "",
@@ -26,4 +26,20 @@ const createAccountStore = zustand.create((set) => ({
     })
 }));
 
-export default createAccountStore;
+export const useAuthStore = zustand.create((set) => ({
+    user: null,
+    conversations: [],
+    friends: [],
+
+    setVerifyData: (data) => set({
+        user: data.user || null,
+        conversations: data.conversations || [],
+        friends: data.friends || []
+    }),
+
+    clearVerifyData: () => set({
+        user: null,
+        conversations: [],
+        friends: []
+    })
+}));

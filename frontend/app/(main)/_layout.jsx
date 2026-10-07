@@ -15,8 +15,8 @@ export default function MainLayout() {
         headerShown: false,
         tabBarStyle: { display: "none" }
       }} />
-      <Tabs.Screen name="friends" options={{ title: "Friends", headerShown: false }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile", headerShown: false }} />
+      <Tabs.Screen name="friends" options={{ title: "Friends", headerShown: false, tabBarStyle: { display: "none" } }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile", headerShown: false, tabBarStyle: { display: "none" } }} />
     </Tabs>
   );
 }

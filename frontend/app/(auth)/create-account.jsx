@@ -7,8 +7,9 @@ import { useState } from "react";
 import { Button1, Button2 } from "../../src/components/common/Button";
 import { usernameSchema, password as passwordSchema } from "../../src/utils/validators";
 import { LogoutCard } from "../../src/components/common/Card"
-import createAccountStore from "../../src/store/authStore";
-import AuthApi from "../../src/api/auth.api"
+import { createAccountStore, useAuthStore } from "../../src/store/authStore";
+import UserStore from "../../src/store/userStore";
+import AuthApi from "../../src/api/auth.api";
 
 
 
@@ -22,7 +23,8 @@ const colors = {
 export default function CreateAccountScreen() {
   const [showWarning, setShowWarning] = useState(false);
 
-  const { username, password, setAuthData, setAccountDetails } = createAccountStore();
+  const { username, password, setAuthData, setAccountDetails, clearAuthData } = createAccountStore();
+  const clearVerifyData = useAuthStore(state => state.clearVerifyData);
 
   const [isloading, setLoading] = useState(false);
   const [serverError, setServerError] = useState(null)
@@ -154,8 +156,11 @@ export default function CreateAccountScreen() {
       <Modal transparent={true} visible={showWarning} animationType="fade">
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
           <LogoutCard
-            onLogout={() => {
+            onLogout={async () => {
               setShowWarning(false);
+              await UserStore.ramoveData("userToken");
+              clearAuthData();
+              clearVerifyData();
               route.replace("/splash");
             }}
             onCancel={() => setShowWarning(false)}

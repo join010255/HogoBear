@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Text, View, StyleSheet, TextInput, ScrollView, FlatList, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Shield, Search, Settings, Lock, Circle, CheckCheck, Mic, Clock, Plus, Key } from "lucide-react-native";
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../../../src/store/authStore';
 
 const colors = {
   background: "#0A0A0A", // Very dark background
@@ -17,91 +19,63 @@ const colors = {
   avatarBg: "#222",
 };
 
-const chatData = [
-  {
-    id: '1',
-    name: 'Cipher Fox',
-    message: 'did you verify the new safety fing...',
-    time: '10:43 AM',
-    unreadCount: 2,
-    avatar: 'https://i.pravatar.cc/150?u=cipher',
-    icon: 'shield',
-  },
-  {
-    id: '2',
-    name: 'Shadow Raven',
-    message: 'Voice note (0:34)',
-    time: 'Yesterday',
-    isVoice: true,
-    read: true,
-    avatar: 'https://i.pravatar.cc/150?u=shadow',
-  },
-  {
-    id: '3',
-    name: 'Ghost Badger',
-    message: 'Key exchange complete.',
-    time: 'Mon',
-    isLocked: true,
-    avatar: 'https://i.pravatar.cc/150?u=ghost',
-    icon: 'key',
-  },
-  {
-    id: '4',
-    name: 'Neon Lynx',
-    message: 'See you in the encrypted room.',
-    time: 'Oct 14',
-    isPending: true,
-    avatar: 'https://i.pravatar.cc/150?u=neon',
-  },
-];
-
 export default function ChatsScreen() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All Chats');
+  const conversations = useAuthStore(state => state.conversations);
+  
+  const renderChatItem = ({ item }) => {
+    // Fallbacks just in case the backend structure is a bit different
+    const chatId = item._id || item.id;
+    
+    // The backend nests the other user's data inside userTwo or userOne
+    const otherUser = item.userTwo || item.userOne || {};
+    const chatName = otherUser.username || item.name || item.username || 'Unknown Raccoon';
+    const chatAvatar = otherUser.profilePicture || item.avatar || item.profilePicture;
+    
+    const chatMessage = item.message || item.lastMessage || 'No messages yet';
+    const chatTime = item.time || '';
 
-  const filters = [
-    { label: 'All Chats' },
-    { label: 'Direct' },
-    { label: 'Vaults', icon: 'lock' },
-    { label: 'Unread', icon: 'dot' }
-  ];
-
-  const renderChatItem = ({ item }) => (
-    <TouchableOpacity style={style.chatItem}>
-      <Image source={{ uri: item.avatar }} style={style.avatarLarge} />
-      
-      <View style={style.chatContent}>
-        <View style={style.chatHeader}>
-          <View style={style.chatNameContainer}>
-            <Text style={style.chatName}>{item.name}</Text>
-            {item.icon === 'shield' && <Shield color={colors.smoletext} size={14} style={style.nameIcon} />}
-            {item.icon === 'key' && <Key color={colors.smoletext} size={14} style={style.nameIcon} />}
-          </View>
-          <Text style={[style.chatTime, item.unreadCount > 0 ? style.chatTimeUnread : null]}>{item.time}</Text>
-        </View>
+    return (
+      <TouchableOpacity 
+        style={style.chatItem}
+        onPress={() => router.push(`/chats/${chatId}`)}
+      >
+        <Image source={{ uri: chatAvatar }} style={style.avatarLarge} />
         
-        <View style={style.chatFooter}>
-          <View style={style.messagePreviewContainer}>
-            {item.isVoice && <Mic color={colors.smoletext} size={14} style={style.msgIcon} />}
-            <Text style={[style.chatMessage, item.unreadCount > 0 && style.chatMessageUnread]} numberOfLines={1}>
-              {item.message}
-            </Text>
+        <View style={style.chatContent}>
+          <View style={style.chatHeader}>
+            <View style={style.chatNameContainer}>
+              <Text style={style.chatName}>{chatName}</Text>
+              {item.icon === 'shield' && <Shield color={colors.smoletext} size={14} style={style.nameIcon} />}
+              {item.icon === 'key' && <Key color={colors.smoletext} size={14} style={style.nameIcon} />}
+            </View>
+            <Text style={[style.chatTime, item.unreadCount > 0 ? style.chatTimeUnread : null]}>{chatTime}</Text>
           </View>
           
-          <View style={style.chatStatus}>
-            {item.unreadCount > 0 && (
-              <View style={style.unreadBadge}>
-                <Text style={style.unreadBadgeText}>{item.unreadCount}</Text>
-              </View>
-            )}
-            {item.read && <CheckCheck color={colors.smoletext} size={16} />}
-            {item.isLocked && <Lock color={colors.smoletext} size={14} />}
-            {item.isPending && <Clock color={colors.smoletext} size={14} />}
+          <View style={style.chatFooter}>
+            <View style={style.messagePreviewContainer}>
+              {item.isVoice && <Mic color={colors.smoletext} size={14} style={style.msgIcon} />}
+              <Text style={[style.chatMessage, item.unreadCount > 0 && style.chatMessageUnread]} numberOfLines={1}>
+                {chatMessage}
+              </Text>
+            </View>
+            
+            <View style={style.chatStatus}>
+              {item.unreadCount > 0 && (
+                <View style={style.unreadBadge}>
+                  <Text style={style.unreadBadgeText}>{item.unreadCount}</Text>
+                </View>
+              )}
+              {item.read && <CheckCheck color={colors.smoletext} size={16} />}
+              {item.isLocked && <Lock color={colors.smoletext} size={14} />}
+              {item.isPending && <Clock color={colors.smoletext} size={14} />}
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={style.screen}>
@@ -114,51 +88,19 @@ export default function ChatsScreen() {
             <Text style={style.headerTitle}>Chats</Text>
           </View>
         </View>
+        
         <View style={style.headerRight}>
-
-          <TouchableOpacity style={style.iconButton}>
-            <Search color={colors.smoletext} size={22} />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={style.iconButton}>
-            <Settings color={colors.smoletext} size={22} />
+          <TouchableOpacity onPress={() => router.push('/(main)/profile')}>
+            <Image 
+              source={require('../../../assets/RACCON_Chat.png')} 
+              style={style.avatarSmall} 
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Search Bar */}
-      <View style={style.searchContainer}>
-        <Search color={colors.smoletext} size={18} style={style.searchIcon} />
-        <TextInput
-          style={style.searchInput}
-          placeholder="Search conversations or Raccoon IDs..."
-          placeholderTextColor={colors.smoletext}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      {/* Filters */}
-      <View style={style.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={style.filtersContent}>
-          {filters.map((filter) => {
-            const isActive = activeFilter === filter.label;
-            return (
-              <TouchableOpacity 
-                key={filter.label}
-                style={[style.filterPill, isActive ? style.filterPillActive : style.filterPillInactive]}
-                onPress={() => setActiveFilter(filter.label)}
-              >
-                {filter.icon === 'lock' && <Lock color={isActive ? colors.pillActiveText : colors.smoletext} size={14} style={{ marginRight: 6 }} />}
-                <Text style={[style.filterText, isActive ? style.filterTextActive : null]}>
-                  {filter.label}
-                </Text>
-                {filter.icon === 'dot' && <View style={[style.unreadDot, { backgroundColor: isActive ? colors.pillActiveText : colors.smoletext }]} />}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+      
 
       <ScrollView style={style.scrollViewContent} contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Banner */}
@@ -174,15 +116,21 @@ export default function ChatsScreen() {
 
         
         <View style={style.chatListContainer}>
-          {chatData.map((item) => (
-            <React.Fragment key={item.id}>
-              {renderChatItem({ item })}
-            </React.Fragment>
-          ))}
+          {conversations && conversations.length > 0 ? (
+            conversations.map((item) => (
+              <React.Fragment key={item._id || item.id}>
+                {renderChatItem({ item })}
+              </React.Fragment>
+            ))
+          ) : (
+            <Text style={{ color: colors.smoletext, textAlign: 'center', marginTop: 20, justifyContent: "center" }}>
+              No chats available
+            </Text>
+          )}
         </View>
         
       </ScrollView>
-      <TouchableOpacity style={style.fab}>
+      <TouchableOpacity style={style.fab} onPress={() => router.push('/(main)/friends/add')}>
           <Plus color={colors.background} size={20} style={style.fabIcon} />
           <Text style={style.fabText}>Add Friend</Text>
       </TouchableOpacity>

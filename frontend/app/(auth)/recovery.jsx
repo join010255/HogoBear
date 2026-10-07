@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
 import { ChevronLeft, Lock, HelpCircle, Copy, Check, BookOpen, Car, Hash, KeyRound, ShieldCheck, ArrowRight, RefreshCw } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import createAccountStore from "../../src/store/authStore";
+import { createAccountStore, useAuthStore } from "../../src/store/authStore";
 import { useState, useEffect } from "react";
 import * as Clipboard from 'expo-clipboard';
 import { Button2 } from "../../src/components/common/Button";
@@ -190,6 +190,7 @@ const style = StyleSheet.create({
 export default function RecoveryScreen() {
   const router = useRouter();
   const { recovery_accout_text, username, tokenUser, password, setAccountDetails } = createAccountStore();
+  const setVerifyData = useAuthStore(state => state.setVerifyData);
   const [hint, setHint] = useState("");
   const [hasCopied, setHasCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -205,7 +206,7 @@ export default function RecoveryScreen() {
       await Clipboard.setStringAsync(hint);
       setHasCopied(true);
 
-      // Raj3o l'icone d Copy mn b3d 3 tawan
+      
       setTimeout(() => {
         setHasCopied(false);
       }, 3000);
@@ -219,6 +220,7 @@ export default function RecoveryScreen() {
     try {
       setIsRefreshing(true);
       const result = await AuthApi.refreshRecoveryText(tokenUser, password);
+      console.log(result)
       setAccountDetails(result.data.data);
     } catch (error) {
       Alert.alert("Error", "Failed to refresh recovery text");
@@ -235,6 +237,10 @@ export default function RecoveryScreen() {
       // Store the token securely and navigate to the main app
       await UserStore.setData("userToken", result.data.data.acessToken);
 
+      // Fetch user data
+      const verifyResponse = await AuthApi.verifyToken();
+      setVerifyData(verifyResponse.data);
+
       router.replace("/(main)/chats");
     } else {
       Alert.alert("Error", "Failed to log in with the provided credentials.");
@@ -247,7 +253,7 @@ export default function RecoveryScreen() {
 
         {/* Header */}
         <View style={style.header}>
-          <TouchableOpacity onPress={() => router.back()} style={style.backBtn}>
+          <TouchableOpacity onPress={() => router.push('/(auth)/create-account')} style={style.backBtn}>
             <ChevronLeft size={28} color={colors.white} />
           </TouchableOpacity>
 
