@@ -146,8 +146,8 @@ export default function CreateAccountScreen() {
             setPasswordError("can you write a username")
           }
           if(!usernameError && !passwordError && username && password) {
-            await handelCreateAccount()
-            route.push("/recovery")
+            if (isloading) return;
+            await handelCreateAccount();
           }
         }} />
       </View>

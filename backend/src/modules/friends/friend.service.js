@@ -86,6 +86,9 @@ class FriendService {
                     error: "this token not found"
                 })
             }
+            if (friendData.id === httpReq.user.id) {
+                 return httpRes.status(400).json({ error: "You cannot add yourself" });
+            }
             const userToken = httpReq.user.id;
             const existingFriendship = await Friends.findOne({
                 where: {
@@ -110,10 +113,19 @@ class FriendService {
             await Friends.create({
                 user_id: userToken,
                 friend_id: friendData.id,
-                status: "PENDING"
+                status: "ACCEPTED"
+            });
+            await Friends.create({
+                user_id: friendData.id,
+                friend_id: userToken,
+                status: "ACCEPTED"
+            });
+            await Conversation.create({
+                user_one: userToken,
+                user_two: friendData.id,
             });
             return httpRes.status(200).json({
-                message: "Friend request sent successfully"
+                message: "Friend added successfully and conversation started"
             });
         } catch (error) {
             return httpRes.status(500).json({

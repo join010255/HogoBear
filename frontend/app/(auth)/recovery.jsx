@@ -194,7 +194,7 @@ export default function RecoveryScreen() {
   const [hint, setHint] = useState("");
   const [hasCopied, setHasCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
+  console.log(recovery_accout_text)
   useEffect(() => {
     if (recovery_accout_text) {
       setHint(recovery_accout_text);
