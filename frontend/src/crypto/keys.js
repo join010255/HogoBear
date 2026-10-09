@@ -1,35 +1,52 @@
-import sodium from 'libsodium-wrappers';
+import nacl from 'tweetnacl';
+import util from 'tweetnacl-util';
 import UserStore from '../store/userStore';
+import { useAuthStore } from '../store/authStore';
 
-
-class Keys{
+class Keys {
     generateX25519Keys = async () => {
-        await sodium.ready;
-
-        const keyPair = sodium.crypto_box_keypair();
+        const keyPair = nacl.box.keyPair();
+        const yourPrivateKeyBase = util.encodeBase64(keyPair.secretKey);
+        const yourPublicKeyBase = util.encodeBase64(keyPair.publicKey);
+        
+        // Save in Zustand
+        useAuthStore.getState().setKeys(yourPublicKeyBase, yourPrivateKeyBase);
 
         return {
-
-            publicKey: sodium.to_base64(keyPair.publicKey),
-
-            privateKey: sodium.to_base64(keyPair.privateKey)
+            publicKey: yourPublicKeyBase,
         };
     };
 
-    exchageKeys = async (friendPublicKey) => {
-        try{
-            await sodium.ready
-
-            const friendPublicKeyBytes = sodium.from_base64(friendPublicKey)
+    exchangeKeys = async (friendPublicKey) => {
+        try {
+            const friendPublicKeyBytes = util.decodeBase64(friendPublicKey);
             
-            if(await UserStore.getData('privateKey')){
+            let yourPrivateKey = useAuthStore.getState().privateKey;
+            
+            if (!yourPrivateKey) {
                 
+                useAuthStore.getState().setKeys(useAuthStore.getState().publicKey, yourPrivateKey);
+               
             }
-            const youPrivatKey = sodium.from_base64()
-
-        }  
+            if (yourPrivateKey) {
+                const yourPrivateKeyBytes = util.decodeBase64(yourPrivateKey);    
+                
+                const rawSharedPoint = nacl.scalarMult(
+                    yourPrivateKeyBytes,
+                    friendPublicKeyBytes
+                );
+                
+                // Hash the shared point to derive a 32-byte AES key (using SHA-512 truncated to 32 bytes)
+                const aesKey32 = nacl.hash(rawSharedPoint).slice(0, 32);
+                return aesKey32;
+            } else {
+                throw new Error("Private key not found in storage");
+            }
+        } catch (error) {
+            console.error("Key exchange error:", error);
+            throw error;
+        }
     }
 }
 
-
-generateX25519Keys().then(keys => console.log(keys)).catch(console.error);
+export default new Keys();

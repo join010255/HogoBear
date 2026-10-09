@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "../src/theme";

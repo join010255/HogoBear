@@ -114,6 +114,7 @@ class UserService {
             await user.update({
                 publicKey: httpReq.body.publicKey
             });
+            console.log(user)
             return httpRes.status(200).json({
                 message: "User updated successfully"
             });

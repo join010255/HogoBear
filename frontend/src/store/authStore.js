@@ -31,15 +31,25 @@ export const useAuthStore = zustand.create((set) => ({
     conversations: [],
     friends: [],
 
+    publicKey: null,
+    privateKey: null,
+
     setVerifyData: (data) => set({
         user: data.user || null,
         conversations: data.conversations || [],
         friends: data.friends || []
     }),
 
+    setKeys: (publicKey, privateKey) => set({
+        publicKey,
+        privateKey
+    }),
+
     clearVerifyData: () => set({
         user: null,
         conversations: [],
-        friends: []
+        friends: [],
+        publicKey: null,
+        privateKey: null
     })
 }));

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, ScrollView, FlatList, TouchableOpacity, Image } from "react-native";
+import React, { useEffect } from 'react';
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Shield, Search, Settings, Lock, Circle, CheckCheck, Mic, Clock, Plus, Key } from "lucide-react-native";
+import { Shield, Lock, CheckCheck, Mic, Clock, Plus, Key } from "lucide-react-native";
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../../src/store/authStore';
+import Keys from "../../../src/crypto/keys";
+import updatesPublicKey from "../../../src/api/auth.api"
 
 const colors = {
-  background: "#0A0A0A", // Very dark background
+  background: "#0A0A0A",
   green: "#1C1C1C",
   white: "#FFFFFF",
   smoletext: "#adadadff",
@@ -21,14 +23,32 @@ const colors = {
 
 export default function ChatsScreen() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
   const conversations = useAuthStore(state => state.conversations);
+  const currentPublicKey = useAuthStore.getState().publicKey;
+  const currentPrivateKey = useAuthStore.getState().privateKey;
   
+  useEffect(() => {
+    const checkKeys = async () => {
+      try{
+        if(!currentPublicKey || !currentPrivateKey){
+          console.log("labobob")
+          await Keys.generateX25519Keys()
+          await updatesPublicKey(currentPublicKey)
+        }
+        
+      }catch(error){
+        console.log(error.error)
+      }
+    }
+    checkKeys()
+  }, [])
+  console.log(currentPublicKey)
+  console.log(currentPrivateKey)
+
+
   const renderChatItem = ({ item }) => {
-    // Fallbacks just in case the backend structure is a bit different
     const chatId = item._id || item.id;
     
-    // The backend nests the other user's data inside userTwo or userOne
     const otherUser = item.userTwo || item.userOne || {};
     const chatName = otherUser.username || item.name || item.username || 'Unknown Raccoon';
     const chatAvatar = otherUser.profilePicture || item.avatar || item.profilePicture;

@@ -34,6 +34,16 @@ class AuthApi {
         } catch (error) {
             throw error;
         }
+    };
+
+    async updatesPublicKey(userPublicKey){
+        try{
+            await api.put("/update-public-key", {
+                publicKey: userPublicKey
+            })
+        }catch(error){
+            throw error;
+        }
     }
 }
 
