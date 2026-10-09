@@ -1,4 +1,4 @@
-import Users from "../models/user.model.js"
+import Users from "../modules/users/user.model.js";
 
 
 const presenceSocket = (io, socket) => {

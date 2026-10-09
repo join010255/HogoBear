@@ -1,5 +1,5 @@
-import Message from "../models/message.model.js";
-import Conversation from "../models/conversation.model.js";
+// import Message from "../models/message.model.js"; // Note: Raccoon Chat is a relay, no messages are saved!
+import Conversation from "../modules/conversations/conversation.model.js";
 
 
 const messageSocket = async(io, socket) => {
@@ -37,14 +37,17 @@ const messageSocket = async(io, socket) => {
                 })
             }
 
-            const message = await Message.create({
-                conversation_id : conversation.id,
-                sender_id : userId,
-                content : content  
-            })
+            // const message = await Message.create({
+            //     conversation_id : conversation.id,
+            //     sender_id : userId,
+            //     content : content  
+            // })
 
+            // Only relay the message
             io.to(`conversation:${conversation.id}`).emit("message:new", {
-                message
+                conversation_id: conversation.id,
+                sender_id: userId,
+                content: content
             })
         }catch(error){
             console.error(error);
