@@ -8,7 +8,7 @@ const userRouter = Router();
 
 userRouter.post("/create-account", validate(createAccountSchema), UserController.createAccount);
 userRouter.post("/login", validate(loginSchema), UserController.login);
-userRouter.put("/update-public-key", UserController.updatePublicKeyUser);
+userRouter.put("/update-public-key", requireAuth, UserController.updatePublicKeyUser);
 userRouter.post("/refresh-recovery", UserController.refreshRecoveryText);
 userRouter.post("/get-token", UserController.getToken);
 userRouter.get("/verify-token", requireAuth, UserController.tokenVerify);

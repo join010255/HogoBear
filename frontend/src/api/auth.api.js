@@ -38,7 +38,7 @@ class AuthApi {
 
     async updatesPublicKey(userPublicKey){
         try{
-            await api.put("/update-public-key", {
+            await api.put("/users/update-public-key", {
                 publicKey: userPublicKey
             })
         }catch(error){

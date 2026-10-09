@@ -135,7 +135,7 @@ export default function CreateAccountScreen() {
       </View>
 
       <View style={{ marginTop: 50, flex: 1 }}>
-        <Button2 title={"Continue"} onPress={async () => {
+        <Button2 title={isloading ? "Creating..." : "Continue"} onPress={async () => {
           if (usernameError || passwordError) {
             return
           }
@@ -146,7 +146,10 @@ export default function CreateAccountScreen() {
             setPasswordError("can you write a username")
           }
           if(!usernameError && !passwordError && username && password) {
+            console.log('lamak')
+            
             if (isloading) return;
+            console.log('albobo')
             await handelCreateAccount();
           }
         }} />

@@ -33,8 +33,15 @@ export default function SplashScreen() {
           setVerifyData(response.data);
           router.replace("/(main)/chats");
         } catch (error) {
-          console.log("Token verification failed or expired, clearing session.");
-          await UserStore.ramoveData("userToken");
+          console.log(error)
+          if (error.response && error.response.status === 401) {
+            console.log("Token verification failed or expired, clearing session.");
+            await UserStore.ramoveData("userToken");
+          } else {
+            console.log("Network error or server is down. Retaining session.");
+            // Optionally, you can route to Chats anyway and let the user see a "connecting..." state
+            // router.replace("/(main)/chats");
+          }
         }
       }
     }

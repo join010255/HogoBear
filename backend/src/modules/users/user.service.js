@@ -103,7 +103,7 @@ class UserService {
         try {
             const user = await User.findOne({
                 where: {
-                    tokenUser: httpReq.body.tokenUser
+                    id: httpReq.user.id
                 }
             });
             if (!user) {

@@ -5,7 +5,7 @@ import { Shield, Lock, CheckCheck, Mic, Clock, Plus, Key } from "lucide-react-na
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../../src/store/authStore';
 import Keys from "../../../src/crypto/keys";
-import updatesPublicKey from "../../../src/api/auth.api"
+import AuthApi from "../../../src/api/auth.api"
 
 const colors = {
   background: "#0A0A0A",
@@ -24,26 +24,26 @@ const colors = {
 export default function ChatsScreen() {
   const router = useRouter();
   const conversations = useAuthStore(state => state.conversations);
-  const currentPublicKey = useAuthStore.getState().publicKey;
-  const currentPrivateKey = useAuthStore.getState().privateKey;
+  const currentPublicKey = useAuthStore(state => state.publicKey);
+  const currentPrivateKey = useAuthStore(state => state.privateKey);
   
   useEffect(() => {
     const checkKeys = async () => {
       try{
         if(!currentPublicKey || !currentPrivateKey){
           console.log("labobob")
-          await Keys.generateX25519Keys()
-          await updatesPublicKey(currentPublicKey)
+          const newKeys = await Keys.generateX25519Keys()
+          await AuthApi.updatesPublicKey(newKeys.publicKey)
         }
-        
       }catch(error){
-        console.log(error.error)
+        console.log(error)
       }
     }
     checkKeys()
   }, [])
-  console.log(currentPublicKey)
-  console.log(currentPrivateKey)
+  
+  console.log("Public Key:", currentPublicKey)
+  console.log("Private Key:", currentPrivateKey)
 
 
   const renderChatItem = ({ item }) => {

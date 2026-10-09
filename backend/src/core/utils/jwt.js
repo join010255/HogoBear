@@ -16,7 +16,7 @@ class JWT {
             id: userData.id,
         }
         const acessToken = jwt.sign(payload, JWT_SECRET, {
-            expiresIn: "1h"
+            expiresIn: "7d"
         });
         return acessToken;
     }
