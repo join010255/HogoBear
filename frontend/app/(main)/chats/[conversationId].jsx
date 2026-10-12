@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons, Feather, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const MESSAGES = [
@@ -14,7 +14,6 @@ const MESSAGES = [
 ];
 
 export default function ConversationScreen() {
-  const { conversationId } = useLocalSearchParams();
   const router = useRouter();
   const [inputText, setInputText] = useState('');
 
@@ -96,7 +95,7 @@ export default function ConversationScreen() {
         style={styles.keyboardView} 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <FlatList
+        {/* <FlatList
           data={MESSAGES}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
@@ -108,7 +107,7 @@ export default function ConversationScreen() {
               </View>
             </View>
           }
-        />
+        /> */}
 
         {/* Input Area */}
         <View style={styles.inputContainer}>

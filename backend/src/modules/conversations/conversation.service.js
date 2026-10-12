@@ -65,6 +65,31 @@ class ConversationService {
                 error: error.message
             });
         }
+    };
+
+    async getFriendPublicKey(httpReq, httpRes) {
+        try{
+            const friendId = httpReq.body;
+            const friendPublicKey = await Users.findByPk(friendId, {
+                attributes: ['publicKey']
+            });
+            
+            if(!friendPublicKey){
+                return httpRes.status(404).json({
+                    message : "User Not Found"
+                })
+            }
+
+            httpRes.status(201).json({
+                secss: true,
+                friendPublicKey : friendPublicKey
+            })
+        }catch(error){
+            httpRes.status(500).json({
+                secss: false,
+                massage: "Server Error"
+            })
+        }
     }
 }
 

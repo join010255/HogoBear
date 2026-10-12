@@ -6,4 +6,5 @@ const router = Router();
 
 router.get("/get-conversations", requireAuth, ConversationController.getAllConversations);
 
+router.post("friend-public-key", )
 export default router;

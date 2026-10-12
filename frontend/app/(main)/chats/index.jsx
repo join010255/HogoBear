@@ -51,7 +51,6 @@ export default function ChatsScreen() {
     
     const otherUser = item.userTwo || item.userOne || {};
     const chatName = otherUser.username || item.name || item.username || 'Unknown Raccoon';
-    const chatAvatar = otherUser.profilePicture || item.avatar || item.profilePicture;
     
     const chatMessage = item.message || item.lastMessage || 'No messages yet';
     const chatTime = item.time || '';
@@ -61,7 +60,6 @@ export default function ChatsScreen() {
         style={style.chatItem}
         onPress={() => router.push(`/chats/${chatId}`)}
       >
-        <Image source={{ uri: chatAvatar }} style={style.avatarLarge} />
         
         <View style={style.chatContent}>
           <View style={style.chatHeader}>

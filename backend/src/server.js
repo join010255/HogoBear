@@ -32,7 +32,6 @@ const main = async () => {
             }
         });
 
-        // Initialize sockets
         setupSockets(io);
 
         server.listen(PORT, () => {
@@ -44,6 +43,4 @@ const main = async () => {
     }
 };
 
-main().catch((err) => {
-    console.error("Error:", err);
-});
+main()
