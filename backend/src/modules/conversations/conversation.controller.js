@@ -8,9 +8,8 @@ class ConversationController {
     async deleteConversation(httpReq, httpRes){
         await ConversationService.deleteConversation(httpReq, httpRes)
     }
-    async deteleConversation(httpReq, httpRes) {
-        await ConversationService.deteleConversation(httpReq, httpRes);
-
+    async getFriendPublicKey(httpReq, httpRes) {
+        await ConversationService.getFriendPublicKey(httpReq, httpRes);
     }
 }
 export default new ConversationController();

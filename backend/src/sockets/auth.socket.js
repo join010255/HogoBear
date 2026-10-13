@@ -6,22 +6,20 @@ dotenv.config({
     path : "../.env"
 });
 
-const authSocket = async(socket, next) => {
-    try{
-        const token = socket.handshake.auth.token
-        if(!token){
-            return next(new Error("Token in fount"));
-        };
+const authSocket = async (socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        if (!token) {
+            return next(new Error("Token not found"));
+        }
 
-        const decode = await jwt.verify(
-            token,
-            process.env.ACCESS_TOKEN_SECRET,
-        );
+        const secret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET;
+        const decode = jwt.verify(token, secret);
         socket.user = decode;
-        next()
-    }catch(error){
-        next(new Error("your token is not valide"))
+        next();
+    } catch (error) {
+        return next(new Error("Invalid token"));
     }
-}
+};
 
 export default authSocket;

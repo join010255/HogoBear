@@ -9,7 +9,13 @@ export default function setupSockets(io) {
 
     // 2. Events Handlers
     io.on("connection", (socket) => {
-        presenceSocket(io, socket)
+        // Join personal room for targeted events (e.g. user_typing, message_delivered)
+        if (socket.user?.id) {
+            socket.join(`user:${socket.user.id}`);
+        }
+
+        presenceSocket(io, socket);
         conversationSocket(io, socket);
+        messageSocket(io, socket);
     });
 }
