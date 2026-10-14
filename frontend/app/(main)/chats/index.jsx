@@ -24,34 +24,37 @@ const colors = {
 export default function ChatsScreen() {
   const router = useRouter();
   const conversations = useAuthStore(state => state.conversations);
+  const currentUser = useAuthStore(state => state.user);
   const currentPublicKey = useAuthStore(state => state.publicKey);
   const currentPrivateKey = useAuthStore(state => state.privateKey);
   
   useEffect(() => {
     const checkKeys = async () => {
-      try{
-        if(!currentPublicKey || !currentPrivateKey){
-          
-          const newKeys = await Keys.generateX25519Keys()
-          if(newKeys.publicKey && newKeys.privateKey){
-            await AuthApi.updatesPublicKey(newKeys.publicKey)
+      try {
+        if (!currentPublicKey || !currentPrivateKey) {
+          const newKeys = await Keys.generateX25519Keys();
+          if (newKeys.publicKey && newKeys.privateKey) {
+            await AuthApi.updatesPublicKey(newKeys.publicKey);
           }
-          console.log(currentPublicKey)
-          
+          console.log("Public Key (generated):", newKeys.publicKey);
+        } else {
+          console.log("Public Key (existing):", currentPublicKey);
         }
-      }catch(error){
-        console.log(error)
+      } catch (error) {
+        console.log("Error checking keys:", error);
       }
-    }
-    checkKeys()
-  }, [])
+    };
+    checkKeys();
+  }, []);
   
 
   const renderChatItem = ({ item }) => {
     const chatId = item._id || item.id;
     
-    const otherUser = item.userTwo || item.userOne || {};
-    const chatName = otherUser.username || item.name || item.username || 'Unknown Raccoon';
+    const otherUser = item.userOne?.id === currentUser?.id 
+      ? item.userTwo 
+      : (item.userOne || item.userTwo || {});
+    const chatName = otherUser?.username || item.name || item.username || 'Unknown Raccoon';
     
     const chatMessage = item.message || item.lastMessage || 'No messages yet';
     const chatTime = item.time || '';

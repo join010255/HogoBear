@@ -1,6 +1,5 @@
 import nacl from 'tweetnacl';
 import util from 'tweetnacl-util';
-import UserStore from '../store/userStore';
 import { useAuthStore } from '../store/authStore';
 
 class Keys {
@@ -14,6 +13,7 @@ class Keys {
 
         return {
             publicKey: yourPublicKeyBase,
+            privateKey: yourPrivateKeyBase,
         };
     };
 

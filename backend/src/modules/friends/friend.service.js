@@ -99,15 +99,15 @@ class FriendService {
                 }
             });
             if (existingFriendship) {
-                if (!existingFriendship.is_blocked) {
+                if (existingFriendship.is_blocked) {
                     return httpRes.status(403).json({
-                        error: "this user if blocked"
-                    })
+                        error: "This user is blocked"
+                    });
                 }
 
                 return httpRes.status(400).json({
-                    message: "this is your frand"
-                })
+                    message: "This user is already your friend"
+                });
             }
             
             await Friends.create({

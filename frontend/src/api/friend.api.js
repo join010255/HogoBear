@@ -5,6 +5,7 @@ class FriendApi {
         try {
             return await api.post("/friends/add-friend", { friend_token });
         } catch (error) {
+            
             throw error;
         }
     }

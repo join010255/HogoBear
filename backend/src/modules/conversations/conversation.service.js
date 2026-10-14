@@ -9,14 +9,22 @@ class ConversationService {
             const conversations = await Conversation.findAll({
                 where: {
                     [Op.or]: [
-                        { user_one: userId }
+                        { user_one: userId },
+                        { user_two: userId }
                     ]
                 }, 
-                include : {
-                    model: Users,
-                    as: "userTwo",
-                    attributes: ["tokenUser", "username"]
-                }
+                include: [
+                    {
+                        model: Users,
+                        as: "userOne",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    },
+                    {
+                        model: Users,
+                        as: "userTwo",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    }
+                ]
             });
             if (conversations.length === 0) {
                 return httpRes.status(200).json({
@@ -28,6 +36,66 @@ class ConversationService {
             });
         } catch (error) {
             throw error;
+        }
+    };
+
+    async getConversationById(httpReq, httpRes) {
+        try {
+            const conversationId = httpReq.params.id;
+            const userId = httpReq.user.id;
+
+            if (!conversationId) {
+                return httpRes.status(400).json({
+                    message: "Conversation ID is required"
+                });
+            }
+
+            const conversation = await Conversation.findOne({
+                where: {
+                    id: conversationId,
+                    [Op.or]: [
+                        { user_one: userId },
+                        { user_two: userId }
+                    ]
+                },
+                include: [
+                    {
+                        model: Users,
+                        as: "userOne",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    },
+                    {
+                        model: Users,
+                        as: "userTwo",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    }
+                ]
+            });
+
+            if (!conversation) {
+                return httpRes.status(404).json({
+                    message: "Conversation not found"
+                });
+            }
+
+            const plainConv = conversation.toJSON();
+            // Only provide publicKey if user is online
+            if (plainConv.userOne && !plainConv.userOne.is_online) {
+                plainConv.userOne.publicKey = null;
+            }
+            if (plainConv.userTwo && !plainConv.userTwo.is_online) {
+                plainConv.userTwo.publicKey = null;
+            }
+
+            return httpRes.status(200).json({
+                conversation: plainConv
+            });
+        } catch (error) {
+            console.error("Error fetching conversation by ID:", error);
+            return httpRes.status(500).json({
+                message: "Internal Server Error",
+                error: error.message
+            });
         }
     };
 

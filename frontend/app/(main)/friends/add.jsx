@@ -36,6 +36,7 @@ export default function AddFriendScreen() {
 
       router.push('/(main)/chats');
     } catch (error) {
+      console.log(error)
       Alert.alert('Connection Failed', error.response?.data?.error || error.response?.data?.message || 'Could not connect with peer.');
     } finally {
       setLoading(false);

@@ -1,21 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { Ionicons, Feather, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Ionicons, Feather } from '@expo/vector-icons';
+import ConversationApi from '../../../src/api/conversations.api';
+import { useAuthStore } from '../../../src/store/authStore';
 
-const MESSAGES = [
-  { id: '1', type: 'system_encryption', text: 'Messages are end-to-end encrypted. No server stores this conversation.' },
-  { id: '2', type: 'received', text: 'hello my friend', time: '10:41 AM' },
-  { id: '3', type: 'received_audio', duration: '0:24', time: '10:41 AM' },
-  { id: '4', type: 'sent', text: 'hello', time: '10:42 AM', read: true },
-  { id: '5', type: 'sent', text: 'did you verify the new safety fingerprint on the device?', time: '10:43 AM', read: true },
-  { id: '6', type: 'sent', text: 'yes, everything matches the hash perfectly.', time: '10:43 AM', read: true },
-];
 
 export default function ConversationScreen() {
   const router = useRouter();
+  const { conversationId } = useLocalSearchParams();
+  const currentUser = useAuthStore((state) => state.user);
+  const [friend, setFriend] = useState(null);
   const [inputText, setInputText] = useState('');
+
+  const isOnline = Boolean(friend?.is_online);
+
+  useEffect(() => {
+    const fetchConversation = async () => {
+      try {
+        const response = await ConversationApi.getConversationById(conversationId);
+        const conv = response.data?.conversation;
+        if (conv) {
+          
+          const friendUser = conv.userOne?.id === currentUser?.id ? conv.userTwo : conv.userOne;
+          setFriend(friendUser);
+        }
+      } catch (error) {
+        console.log("Error fetching conversation:", error);
+      }
+    };
+
+    if (conversationId) {
+      fetchConversation();
+    }
+  }, [conversationId]);
 
   const renderMessage = ({ item }) => {
     if (item.type === 'system_encryption') {
@@ -65,26 +84,41 @@ export default function ConversationScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header Area */}
       
-
-      {/* Sub Header (Contact Info) */}
       <View style={styles.contactHeader}>
         <View style={styles.contactInfo}>
-          <View>
-            <Image 
-              source={{ uri: 'https://i.pravatar.cc/150?u=cipher' }} 
-              style={styles.avatar} 
-            />
-            <View style={styles.onlineIndicator} />
-          </View>
-          <View style={styles.contactTextContainer}>
-            <Text style={styles.contactName}>Cipher Fox</Text>
-            <Text style={styles.activeStatus}>• ACTIVE NOW</Text>
-          </View>
+          <TouchableOpacity 
+            onPress={() => router.back()} 
+            style={{ marginRight: 10, padding: 4 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.contactTextContainer} 
+            onPress={() => {
+              if (!friend) return;
+              router.push({
+                pathname: '/(main)/profile',
+                params: {
+                  friendId: friend.id,
+                  username: friend.username,
+                  tokenUser: friend.tokenUser,
+                  is_online: isOnline ? 'true' : 'false',
+                  publicKey: friend.publicKey || ''
+                }
+              });
+            }}
+          >
+            <Text style={styles.contactName}>
+              {friend?.username || "Loading..."}
+            </Text>
+            <Text style={[styles.activeStatus, { color: isOnline ? "#4ade80" : "#888888" }]}>
+              {isOnline ? "• ONLINE" : "• OFFLINE"}
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.contactActions}>
-          
           <TouchableOpacity style={styles.actionIcon}>
             <Feather name="more-vertical" size={20} color="#888" />
           </TouchableOpacity>
@@ -111,24 +145,36 @@ export default function ConversationScreen() {
 
         {/* Input Area */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton}>
-            <Feather name="plus" size={24} color="#888" />
+          <TouchableOpacity style={styles.attachButton} disabled={!isOnline}>
+            <Feather name="plus" size={24} color={isOnline ? "#888" : "#444"} />
           </TouchableOpacity>
-          <View style={styles.textInputWrapper}>
+          <View style={[styles.textInputWrapper, !isOnline && { opacity: 0.5 }]}>
             <TextInput
               style={styles.textInput}
-              placeholder="Message..."
+              placeholder={isOnline ? "Message..." : "User is offline (cannot send message)"}
               placeholderTextColor="#666"
               value={inputText}
               onChangeText={setInputText}
+              editable={isOnline}
               multiline
             />
-            <TouchableOpacity style={styles.micButton}>
-              <Feather name="mic" size={20} color="#888" />
+            <TouchableOpacity style={styles.micButton} disabled={!isOnline}>
+              <Feather name="mic" size={20} color={isOnline ? "#888" : "#444"} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.sendButton}>
-            <Ionicons name="send" size={18} color="#000" />
+          <TouchableOpacity 
+            style={[
+              styles.sendButton,
+              (!isOnline || !inputText.trim()) && { backgroundColor: "#333", opacity: 0.5 }
+            ]}
+            disabled={!isOnline || !inputText.trim()}
+            onPress={() => {
+              if (!isOnline) return;
+              console.log("Sending message to friend with public key:", friend?.publicKey);
+              setInputText('');
+            }}
+          >
+            <Ionicons name="send" size={18} color={isOnline && inputText.trim() ? "#000" : "#666"} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

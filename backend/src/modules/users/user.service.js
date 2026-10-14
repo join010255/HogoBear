@@ -114,7 +114,6 @@ class UserService {
             await user.update({
                 publicKey: httpReq.body.publicKey
             });
-            console.log(user)
             return httpRes.status(200).json({
                 message: "User updated successfully"
             });
@@ -317,15 +316,22 @@ class UserService {
             const conversations = await Conversation.findAll({
                 where: {
                     [Op.or]: [
-                        { user_one: userId }
-                        // You can add { user_two: userId } here if applicable in your model
+                        { user_one: userId },
+                        { user_two: userId }
                     ]
                 }, 
-                include : {
-                    model: User,
-                    as: "userTwo", // Make sure this matches your model association
-                    attributes: ["tokenUser", "username"]
-                }
+                include: [
+                    {
+                        model: User,
+                        as: "userOne",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    },
+                    {
+                        model: User,
+                        as: "userTwo",
+                        attributes: ["id", "tokenUser", "username", "publicKey", "is_online"]
+                    }
+                ]
             });
 
             // Fetch friends for the user
