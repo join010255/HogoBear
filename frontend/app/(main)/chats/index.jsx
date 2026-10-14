@@ -31,9 +31,13 @@ export default function ChatsScreen() {
     const checkKeys = async () => {
       try{
         if(!currentPublicKey || !currentPrivateKey){
-          console.log("labobob")
+          
           const newKeys = await Keys.generateX25519Keys()
-          await AuthApi.updatesPublicKey(newKeys.publicKey)
+          if(newKeys.publicKey && newKeys.privateKey){
+            await AuthApi.updatesPublicKey(newKeys.publicKey)
+          }
+          console.log(currentPublicKey)
+          
         }
       }catch(error){
         console.log(error)
@@ -42,9 +46,6 @@ export default function ChatsScreen() {
     checkKeys()
   }, [])
   
-  console.log("Public Key:", currentPublicKey)
-  console.log("Private Key:", currentPrivateKey)
-
 
   const renderChatItem = ({ item }) => {
     const chatId = item._id || item.id;
