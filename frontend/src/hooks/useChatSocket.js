@@ -7,10 +7,6 @@ export const useChatSocket = ({
   conversationId,
   onPeerInfoLoaded,
   onReceiveMessage,
-  onMessageSentAck,
-  onMessageDelivered,
-  onSyncPending,
-  onUserTyping,
   onPresenceChange,
 }) => {
   const socketRef = useRef(null);
@@ -57,25 +53,6 @@ export const useChatSocket = ({
       if (onReceiveMessage) onReceiveMessage(message);
     });
 
-    // تأكيد استلام السيرفر للمسج (علامة واحدة ✓)
-    socket.on('message_sent_ack', (data) => {
-      if (onMessageSentAck) onMessageSentAck(data);
-    });
-
-    // تأكيد استلام المسج من طرف الصديق (علامتين ✓✓)
-    socket.on('message_delivered', (data) => {
-      if (onMessageDelivered) onMessageDelivered(data);
-    });
-
-    // مزامنة مسجات الأوفلاين
-    socket.on('sync_pending_messages', (messages) => {
-      if (onSyncPending) onSyncPending(messages);
-    });
-
-    // مؤشر الكتابة (Typing indicator)
-    socket.on('user_typing', (data) => {
-      if (onUserTyping) onUserTyping(data);
-    });
 
     // حالة التواجد (Online / Offline)
     socket.on('user_online', (data) => {
@@ -117,41 +94,15 @@ export const useChatSocket = ({
     }
   }, [conversationId]);
 
-  // تأكيد تسليم المسج للصديق
-  const sendDeliveryAck = useCallback((messageId, senderId) => {
-    if (socketRef.current) {
-      socketRef.current.emit('message_delivered_ack', { messageId, senderId });
-    }
-  }, []);
 
-  // تأكيد مسح مسجات الأوفلاين بعد حفظها محلياً
-  const acknowledgePendingSynced = useCallback((messageIds) => {
-    if (socketRef.current) {
-      socketRef.current.emit('ack_pending_synced', { messageIds });
-    }
-  }, []);
 
-  // بدء الكتابة
-  const startTyping = useCallback((recipientId) => {
-    if (socketRef.current && conversationId) {
-      socketRef.current.emit('typing_start', { recipientId, conversationId });
-    }
-  }, [conversationId]);
-
-  // توقف عن الكتابة
-  const stopTyping = useCallback((recipientId) => {
-    if (socketRef.current && conversationId) {
-      socketRef.current.emit('typing_stop', { recipientId, conversationId });
-    }
-  }, [conversationId]);
 
   return {
     socket: socketRef.current,
     sendMessage,
     sendDeliveryAck,
     acknowledgePendingSynced,
-    startTyping,
-    stopTyping,
+  
   };
 };
 
