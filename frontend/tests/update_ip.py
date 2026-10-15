@@ -14,31 +14,30 @@ def get_local_ip():
         s.close()
     return IP
 
-def update_api_file(file_path):
+def update_ip_files():
     local_ip = get_local_ip()
     print(f"Local IP detected: {local_ip}")
     
-    if not os.path.exists(file_path):
-        print(f"Error: {file_path} not found.")
-        return
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.abspath(os.path.join(script_dir, '..'))
 
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+    # 1. Update frontend/.env
+    env_path = os.path.join(frontend_dir, '.env')
+    env_content = f"EXPO_PUBLIC_API_URL=http://{local_ip}:3000/api\nEXPO_PUBLIC_SOCKET_URL=http://{local_ip}:3000\n"
+    with open(env_path, 'w', encoding='utf-8') as f:
+        f.write(env_content)
+    print(f"Updated {env_path}")
 
-    # Regex to match http://<any-ip-or-localhost>:<port>/api
-    new_url = f"http://{local_ip}:3000/api"
-    new_content = re.sub(r'http://[a-zA-Z0-9\.]+:\d+/api', new_url, content)
-
-    if content != new_content:
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(new_content)
-        print(f"Updated {file_path} with new IP: {local_ip}")
-    else:
-        print("IP is already up to date or no matching URL found.")
+    # 2. Update config.js fallback IP if present
+    config_path = os.path.join(frontend_dir, 'src', 'constants', 'config.js')
+    if os.path.exists(config_path):
+        with open(config_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        new_content = re.sub(r"return '\d+\.\d+\.\d+\.\d+';", f"return '{local_ip}';", content)
+        if content != new_content:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            print(f"Updated fallback in {config_path}")
 
 if __name__ == "__main__":
-    # Assuming script is in frontend/tests and api.js is in frontend/src/api
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    api_file_path = os.path.abspath(os.path.join(script_dir, '..', 'src', 'api', 'api.js'))
-    
-    update_api_file(api_file_path)
+    update_ip_files()

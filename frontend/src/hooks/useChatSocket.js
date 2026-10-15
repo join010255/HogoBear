@@ -7,6 +7,8 @@ export const useChatSocket = ({
   conversationId,
   onPeerInfoLoaded,
   onReceiveMessage,
+  onMessageSentAck,
+  onMessageDelivered,
   onPresenceChange,
 }) => {
   const socketRef = useRef(null);
@@ -17,14 +19,17 @@ export const useChatSocket = ({
     // 1. إنشاء الاتصال مع إرسال JWT Token فـ auth handshake
     socketRef.current = io(SOCKET_URL, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
     });
 
     const socket = socketRef.current;
 
     socket.on('connect', () => {
-      console.log('Socket connected successfully:', socket.id);
+      console.log('Socket connected successfully:', socket.id, 'to', SOCKET_URL);
 
       // إذا كنا فـ محادثة معينة، ندخلو للـ Room مباشرة
       if (conversationId) {
@@ -33,7 +38,7 @@ export const useChatSocket = ({
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err.message);
+      console.error('Socket connection error:', err.message, `(Target: ${SOCKET_URL})`);
     });
 
     // ==========================
@@ -50,9 +55,20 @@ export const useChatSocket = ({
 
     // استقبال رسالة مشفرة جديدة
     socket.on('receive_message', (message) => {
+      console.log(message)
       if (onReceiveMessage) onReceiveMessage(message);
     });
 
+
+    // تأكيد استلام السيرفر للمسج
+    socket.on('message_sent_ack', (data) => {
+      if (onMessageSentAck) onMessageSentAck(data);
+    });
+
+    // تأكيد استلام المسج من الصديق
+    socket.on('message_delivered', (data) => {
+      if (onMessageDelivered) onMessageDelivered(data);
+    });
 
     // حالة التواجد (Online / Offline)
     socket.on('user_online', (data) => {
@@ -94,15 +110,9 @@ export const useChatSocket = ({
     }
   }, [conversationId]);
 
-
-
-
   return {
     socket: socketRef.current,
     sendMessage,
-    sendDeliveryAck,
-    acknowledgePendingSynced,
-  
   };
 };
 

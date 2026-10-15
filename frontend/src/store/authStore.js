@@ -39,6 +39,23 @@ export const useAuthStore = create((set) => ({
         friends: data.friends || []
     }),
 
+    setConversations: (conversations) => set({ conversations }),
+
+    updateUserPresence: (userId, isOnline) => set((state) => ({
+        conversations: (state.conversations || []).map((conv) => {
+            const isUserOne = conv.userOne?.id === userId;
+            const isUserTwo = conv.userTwo?.id === userId;
+            if (isUserOne || isUserTwo) {
+                return {
+                    ...conv,
+                    userOne: isUserOne ? { ...conv.userOne, is_online: isOnline } : conv.userOne,
+                    userTwo: isUserTwo ? { ...conv.userTwo, is_online: isOnline } : conv.userTwo,
+                };
+            }
+            return conv;
+        }),
+    })),
+
     setKeys: (publicKey, privateKey) => set({
         publicKey,
         privateKey

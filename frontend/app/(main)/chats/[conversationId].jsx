@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, FlatList  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import ConversationApi from '../../../src/api/conversations.api';
 import { useAuthStore } from '../../../src/store/authStore';
-
+import UserStore from '../../../src/store/userStore';
+import { useChatSocket } from '../../../src/hooks/useChatSocket';
 
 export default function ConversationScreen() {
   const router = useRouter();
@@ -13,28 +14,68 @@ export default function ConversationScreen() {
   const currentUser = useAuthStore((state) => state.user);
   const [friend, setFriend] = useState(null);
   const [inputText, setInputText] = useState('');
-
+  const [token, setToken] = useState(null);
+  const [messages, setMessages] = useState([]);
   const isOnline = Boolean(friend?.is_online);
 
   useEffect(() => {
-    const fetchConversation = async () => {
-      try {
-        const response = await ConversationApi.getConversationById(conversationId);
-        const conv = response.data?.conversation;
-        if (conv) {
-          
-          const friendUser = conv.userOne?.id === currentUser?.id ? conv.userTwo : conv.userOne;
-          setFriend(friendUser);
-        }
-      } catch (error) {
-        console.log("Error fetching conversation:", error);
+    const loadToken = async() => {
+      const userToken = await UserStore.getData("userToken")
+      if(userToken){
+        setToken(userToken)
       }
-    };
-
-    if (conversationId) {
-      fetchConversation();
     }
-  }, [conversationId]);
+    loadToken()
+  }, []);
+
+    const { sendMessage } = useChatSocket({
+    token,
+    conversationId,
+    onPeerInfoLoaded: (peer) => {
+      if (peer) {
+        setFriend((prev) => ({
+          ...prev,
+          ...peer,
+          is_online: peer.isOnline !== undefined ? peer.isOnline : prev?.is_online,
+        }));
+      }
+    },
+    onReceiveMessage: (msg) => {
+      const receivedMsg = {
+        id: msg.messageId || msg.tempId || Date.now().toString(),
+        text: typeof msg.payload === 'string' ? msg.payload : msg.payload?.text,
+        type: 'received',
+        time: new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, receivedMsg]);
+    },
+    onPresenceChange: ({ userId, isOnline }) => {
+      setFriend((prev) => {
+        if (prev && (!userId || prev.id === userId)) {
+          return { ...prev, is_online: isOnline };
+        }
+        return prev;
+      });
+    },
+  });
+
+  const handleSendMessage = () => {
+    if (!inputText.trim() || !isOnline || !friend?.id) return;
+
+    const tempId = Date.now().toString();
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newMsg = {
+      id: tempId,
+      text: inputText.trim(),
+      type: 'sent',
+      time: timeNow,
+    };
+    setMessages((prev) => [...prev, newMsg]);
+
+    sendMessage(tempId, friend.id, inputText.trim());
+    setInputText('');
+  };
 
   const renderMessage = ({ item }) => {
     if (item.type === 'system_encryption') {
@@ -129,19 +170,12 @@ export default function ConversationScreen() {
         style={styles.keyboardView} 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* <FlatList
-          data={MESSAGES}
+        <FlatList
+          data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
           contentContainerStyle={styles.messagesList}
-          ListHeaderComponent={
-            <View style={styles.dateBadgeContainer}>
-              <View style={styles.dateBadge}>
-                <Text style={styles.dateText}>TODAY</Text>
-              </View>
-            </View>
-          }
-        /> */}
+        />
 
         {/* Input Area */}
         <View style={styles.inputContainer}>
@@ -168,11 +202,7 @@ export default function ConversationScreen() {
               (!isOnline || !inputText.trim()) && { backgroundColor: "#333", opacity: 0.5 }
             ]}
             disabled={!isOnline || !inputText.trim()}
-            onPress={() => {
-              if (!isOnline) return;
-              console.log("Sending message to friend with public key:", friend?.publicKey);
-              setInputText('');
-            }}
+            onPress={handleSendMessage}
           >
             <Ionicons name="send" size={18} color={isOnline && inputText.trim() ? "#000" : "#666"} />
           </TouchableOpacity>

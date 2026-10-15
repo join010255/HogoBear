@@ -12,6 +12,4 @@ router.get("/:id", requireAuth, ConversationController.getConversationById);
 
 router.delete("/delete-conversation/:id", requireAuth, ConversationController.deleteConversation);
 
-router.post("/friend-public-key", requireAuth, validateFriend, ConversationController.getFriendPublicKey);
-
 export default router;

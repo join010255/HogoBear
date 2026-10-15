@@ -83,6 +83,7 @@ class UserService {
                     message: "Invalid password"
                 });
             }
+            await user.update({ is_online: true });
             httpRes.status(200).json({
                 message: "Login successfully",
                 data: {
@@ -311,6 +312,7 @@ class UserService {
                     message: "User not found"
                 });
             }
+            await user.update({ is_online: true });
             
             // Fetch conversations for the user
             const conversations = await Conversation.findAll({
