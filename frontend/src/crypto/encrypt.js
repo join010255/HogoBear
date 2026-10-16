@@ -1,1 +1,10 @@
-export async function encryptMessage() { throw new Error("Message encryption is not configured yet."); }
+import util from "tweetnacl-util";
+
+
+export function encryptionMess(plainText){
+    try{
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+
+        const encodedText = new TextEncoder().encode(plainText);
+    }
+}

@@ -16,7 +16,6 @@ export const useChatSocket = ({
   useEffect(() => {
     if (!token) return;
 
-    // 1. إنشاء الاتصال مع إرسال JWT Token فـ auth handshake
     socketRef.current = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],
@@ -31,7 +30,6 @@ export const useChatSocket = ({
     socket.on('connect', () => {
       console.log('Socket connected successfully:', socket.id, 'to', SOCKET_URL);
 
-      // إذا كنا فـ محادثة معينة، ندخلو للـ Room مباشرة
       if (conversationId) {
         socket.emit('conversation:join', { conversation_id: conversationId });
       }
@@ -41,36 +39,26 @@ export const useChatSocket = ({
       console.error('Socket connection error:', err.message, `(Target: ${SOCKET_URL})`);
     });
 
-    // ==========================
-    // LISTENERS (Event Handlers)
-    // ==========================
-
-    // استقبال معلومات الصديق والـ Public Key بعد الانضمام للشات
     socket.on('conversation:joined', (data) => {
       console.log('Successfully joined conversation:', data);
       if (onPeerInfoLoaded && data?.peer) {
-        onPeerInfoLoaded(data.peer); // { id, username, publicKey, tokenUser, isOnline }
+        onPeerInfoLoaded(data.peer);
       }
     });
 
-    // استقبال رسالة مشفرة جديدة
     socket.on('receive_message', (message) => {
-      console.log(message)
+      console.log('Received message:', message);
       if (onReceiveMessage) onReceiveMessage(message);
     });
 
-    
-    // تأكيد استلام السيرفر للمسج
     socket.on('message_sent_ack', (data) => {
       if (onMessageSentAck) onMessageSentAck(data);
     });
 
-    // تأكيد استلام المسج من الصديق
     socket.on('message_delivered', (data) => {
       if (onMessageDelivered) onMessageDelivered(data);
     });
 
-    // حالة التواجد (Online / Offline)
     socket.on('user_online', (data) => {
       if (onPresenceChange) onPresenceChange({ ...data, isOnline: true });
     });
@@ -83,7 +71,6 @@ export const useChatSocket = ({
       console.error('Socket error event:', err?.message || err);
     });
 
-    // Cleanup فاش كيخرج اليوزر من الشات أو الـ Component
     return () => {
       if (socket) {
         if (conversationId) {
@@ -94,18 +81,13 @@ export const useChatSocket = ({
     };
   }, [token, conversationId]);
 
-  // ==========================
-  // EMITTERS (Actions)
-  // ==========================
-
-  // إرسال مسج مشفر
   const sendMessage = useCallback((tempId, recipientId, payload) => {
     if (socketRef.current && conversationId) {
       socketRef.current.emit('send_message', {
         tempId,
         recipientId,
         conversationId,
-        payload, // { nonce, ciphertext } أو أي بيانات
+        payload,
       });
     }
   }, [conversationId]);

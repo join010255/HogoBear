@@ -7,6 +7,8 @@ import ConversationApi from '../../../src/api/conversations.api';
 import { useAuthStore } from '../../../src/store/authStore';
 import UserStore from '../../../src/store/userStore';
 import { useChatSocket } from '../../../src/hooks/useChatSocket';
+import Keys from "../../../src/crypto/keys"
+
 
 export default function ConversationScreen() {
   const router = useRouter();
@@ -16,7 +18,10 @@ export default function ConversationScreen() {
   const [inputText, setInputText] = useState('');
   const [token, setToken] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [shareKey, setSharedKey] = useState(null);
   const isOnline = Boolean(friend?.is_online);
+
+
 
   useEffect(() => {
     const loadToken = async() => {
@@ -31,8 +36,13 @@ export default function ConversationScreen() {
     const { sendMessage } = useChatSocket({
     token,
     conversationId,
-    onPeerInfoLoaded: (peer) => {
+    onPeerInfoLoaded: async(peer) => {
       if (peer) {
+        if(peer?.publicKey){
+          const key = await Keys.exchangeKeys(peer.publicKey)
+          setSharedKey(key)
+          console.log(key)
+        }  
         setFriend((prev) => ({
           ...prev,
           ...peer,
@@ -179,9 +189,7 @@ export default function ConversationScreen() {
 
         {/* Input Area */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton} disabled={!isOnline}>
-            <Feather name="plus" size={24} color={isOnline ? "#888" : "#444"} />
-          </TouchableOpacity>
+          
           <View style={[styles.textInputWrapper, !isOnline && { opacity: 0.5 }]}>
             <TextInput
               style={styles.textInput}
@@ -192,9 +200,7 @@ export default function ConversationScreen() {
               editable={isOnline}
               multiline
             />
-            <TouchableOpacity style={styles.micButton} disabled={!isOnline}>
-              <Feather name="mic" size={20} color={isOnline ? "#888" : "#444"} />
-            </TouchableOpacity>
+            
           </View>
           <TouchableOpacity 
             style={[
@@ -420,7 +426,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+
   },
   attachButton: {
     padding: 10,

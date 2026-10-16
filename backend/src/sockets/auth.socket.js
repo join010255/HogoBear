@@ -16,6 +16,7 @@ const authSocket = async (socket, next) => {
         const secret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET;
         const decode = jwt.verify(token, secret);
         socket.user = decode;
+        
         next();
     } catch (error) {
         return next(new Error("Invalid token"));
