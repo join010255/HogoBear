@@ -29,7 +29,7 @@ export default function ChatsScreen() {
   const currentPublicKey = useAuthStore(state => state.publicKey);
   const currentPrivateKey = useAuthStore(state => state.privateKey);
 
-  // تحديث المحادثات وحالة الأونلاين فاش كتحل الشاشة
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchConversations = async () => {

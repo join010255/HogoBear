@@ -40,7 +40,7 @@ export const useChatSocket = ({
     });
 
     socket.on('conversation:joined', (data) => {
-      console.log('Successfully joined conversation:', data);
+      console.log('Successfully joined conversation:',  );
       if (onPeerInfoLoaded && data?.peer) {
         onPeerInfoLoaded(data.peer);
       }
