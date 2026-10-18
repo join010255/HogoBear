@@ -1,8 +1,9 @@
 import axios from "axios";
 import UserStore from "../store/userStore.js";
+import { API_URL } from "../constants/config.js";
 
 const api = axios.create({
-    baseURL: "http://192.168.1.217:3000/api"
+    baseURL: API_URL
 });
 
 api.interceptors.request.use(

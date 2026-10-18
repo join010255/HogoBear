@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Shield, Lock, CheckCheck, Mic, Clock, Plus, Key } from "lucide-react-native";
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuthStore } from '../../../src/store/authStore';
 import Keys from "../../../src/crypto/keys";
-import AuthApi from "../../../src/api/auth.api"
+import AuthApi from "../../../src/api/auth.api";
+import ConversationApi from "../../../src/api/conversations.api";
 
 const colors = {
   background: "#0A0A0A",
@@ -24,48 +25,84 @@ const colors = {
 export default function ChatsScreen() {
   const router = useRouter();
   const conversations = useAuthStore(state => state.conversations);
+  const currentUser = useAuthStore(state => state.user);
   const currentPublicKey = useAuthStore(state => state.publicKey);
   const currentPrivateKey = useAuthStore(state => state.privateKey);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchConversations = async () => {
+        try {
+          const res = await ConversationApi.getAllConversations();
+          if (res.data?.conversations) {
+            useAuthStore.getState().setConversations(res.data.conversations);
+          }
+        } catch (err) {
+          console.log("Error fetching conversations:", err);
+        }
+      };
+      fetchConversations();
+    }, [])
+  );
   
   useEffect(() => {
     const checkKeys = async () => {
-      try{
-        if(!currentPublicKey || !currentPrivateKey){
-          
-          const newKeys = await Keys.generateX25519Keys()
-          if(newKeys.publicKey && newKeys.privateKey){
-            await AuthApi.updatesPublicKey(newKeys.publicKey)
+      try {
+        if (!currentPublicKey || !currentPrivateKey) {
+          const newKeys = await Keys.generateX25519Keys();
+          if (newKeys.publicKey && newKeys.privateKey) {
+            await AuthApi.updatesPublicKey(newKeys.publicKey);
           }
-          console.log(currentPublicKey)
-          
+          console.log("Public Key (generated):", newKeys.publicKey);
+        } else {
+          console.log("Public Key (existing):", currentPublicKey);
         }
-      }catch(error){
-        console.log(error)
+      } catch (error) {
+        console.log("Error checking keys:", error);
       }
-    }
-    checkKeys()
-  }, [])
+    };
+    checkKeys();
+  }, []);
   
 
   const renderChatItem = ({ item }) => {
     const chatId = item._id || item.id;
     
-    const otherUser = item.userTwo || item.userOne || {};
-    const chatName = otherUser.username || item.name || item.username || 'Unknown Raccoon';
+    const otherUser = item.userOne?.id === currentUser?.id 
+      ? item.userTwo 
+      : (item.userOne || item.userTwo || {});
+    const chatName = otherUser?.username || item.name || item.username || 'Unknown Raccoon';
+    const isOnline = Boolean(otherUser?.is_online);
     
     const chatMessage = item.message || item.lastMessage || 'No messages yet';
     const chatTime = item.time || '';
 
     return (
       <TouchableOpacity 
-        style={style.chatItem}
-        onPress={() => router.push(`/chats/${chatId}`)}
+        style={[style.chatItem, !isOnline && { opacity: 0.6 }]}
+        onPress={() => {
+          if (!isOnline) {
+            Alert.alert("User Offline", `${chatName} is currently offline. You can only open the conversation when they are online.`);
+            return;
+          }
+          router.push(`/chats/${chatId}`);
+        }}
       >
         
         <View style={style.chatContent}>
           <View style={style.chatHeader}>
             <View style={style.chatNameContainer}>
               <Text style={style.chatName}>{chatName}</Text>
+              <View 
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: isOnline ? '#4ade80' : '#666',
+                  marginLeft: 6
+                }} 
+              />
               {item.icon === 'shield' && <Shield color={colors.smoletext} size={14} style={style.nameIcon} />}
               {item.icon === 'key' && <Key color={colors.smoletext} size={14} style={style.nameIcon} />}
             </View>

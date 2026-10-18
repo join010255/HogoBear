@@ -5,6 +5,10 @@ class ConversationController {
         await ConversationService.getAllConversations(httpReq, httpRes);
     }
 
+    async getConversationById(httpReq, httpRes) {
+        await ConversationService.getConversationById(httpReq, httpRes);
+    }
+
     async deleteConversation(httpReq, httpRes){
         await ConversationService.deleteConversation(httpReq, httpRes)
     }

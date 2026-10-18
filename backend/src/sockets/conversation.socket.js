@@ -27,7 +27,7 @@ const conversationSocket = (io, socket) => {
                 });
             }
 
-            // Join room with consistent formatting
+            
             const roomName = `conversation:${conversationId}`;
             socket.join(roomName);
 

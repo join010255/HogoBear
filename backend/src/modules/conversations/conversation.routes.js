@@ -7,8 +7,9 @@ const router = Router();
 
 router.get("/get-conversations", requireAuth, ConversationController.getAllConversations);
 
-router.delete("/delete-conversation/:id", requireAuth, ConversationController.deleteConversation);
+router.get("/get-conversation/:id", requireAuth, ConversationController.getConversationById);
+router.get("/:id", requireAuth, ConversationController.getConversationById);
 
-router.post("/friend-public-key", requireAuth, validateFriend, ConversationController.getFriendPublicKey);
+router.delete("/delete-conversation/:id", requireAuth, ConversationController.deleteConversation);
 
 export default router;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { 
   ChevronLeft, Settings, Camera, BadgeCheck, Lock, 
@@ -24,18 +24,21 @@ const colors = {
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const isFriend = Boolean(params.username || params.friendId);
   const user = useAuthStore(state => state.user);
   const clearVerifyData = useAuthStore(state => state.clearVerifyData);
   
-  const [isBiometricsEnabled, setIsBiometricsEnabled] = useState(true);
   const [hasCopied, setHasCopied] = useState(false);
 
-  const displayName = user?.username || 'SlyRaccoon_99';
+  const displayName = isFriend ? (params.username || 'Friend') : (user?.username || 'SlyRaccoon_99');
   const handle = `@${displayName.toLowerCase()}`;
-  const fullId = user?.tokenUser || '';
+  const fullId = isFriend ? (params.tokenUser || '') : (user?.tokenUser || '');
   const displayId = fullId.length > 25 ? `RC-${fullId.substring(0, 25)}...` : `RC-${fullId}`;
+  const isOnline = isFriend ? (params.is_online === 'true') : true;
 
   const copyToClipboard = async () => {
+    if (!fullId) return;
     await Clipboard.setStringAsync(fullId);
     setHasCopied(true);
     setTimeout(() => {
@@ -53,13 +56,13 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/(main)/chats')}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
           <ChevronLeft color={colors.text} size={28} />
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
-          <View style={styles.onlineDotSmall} />
-          <Text style={styles.headerTitle}>ENCLAVE IDENTITY</Text>
+          <View style={[styles.onlineDotSmall, { backgroundColor: isOnline ? "#4ade80" : colors.muted }]} />
+          <Text style={styles.headerTitle}>{isFriend ? "FRIEND PROFILE" : "ENCLAVE IDENTITY"}</Text>
         </View>
       </View>
 
@@ -86,10 +89,7 @@ export default function ProfileScreen() {
           </View>
           <Text style={styles.handleText}>{handle}</Text>
 
-          <View style={styles.meshPill}>
-            <Lock color={colors.text} size={12} />
-            <Text style={styles.meshText}>ZERO-KNOWLEDGE MESH ACTIVE</Text>
-          </View>
+         
         </View>
 
         {/* Universal ID Card */}
@@ -112,30 +112,49 @@ export default function ProfileScreen() {
 
 
         
-        <View style={styles.togglesCard}>
-          
-          <TouchableOpacity style={styles.toggleRow}>
-            <View style={[styles.actionIcon, {backgroundColor: 'rgba(255, 69, 58, 0.1)'}]}>
-              <Trash2 color={colors.red} size={20} />
-            </View>
-            <View style={styles.actionTexts}>
-              <Text style={[styles.actionTitle, {color: colors.red}]}>Purge Local Enclave</Text>
-              <Text style={styles.actionSubtitle}>Instant zeroization of ephemeral caches</Text>
-            </View>
-            <AlertTriangle color={colors.red} size={20} />
-          </TouchableOpacity>
+        {isFriend ? (
+          <View style={styles.togglesCard}>
+            <TouchableOpacity 
+              style={[styles.toggleRow, {borderBottomWidth: 0}]} 
+              onPress={() => router.back()}
+            >
+              <View style={[styles.actionIcon, {backgroundColor: 'rgba(255, 255, 255, 0.1)'}]}>
+                <Lock color={colors.text} size={20} />
+              </View>
+              <View style={styles.actionTexts}>
+                <Text style={styles.actionTitle}>End-to-End Encrypted Chat</Text>
+                <Text style={styles.actionSubtitle}>
+                  {isOnline ? "Peer is online and reachable" : "Peer is currently offline"}
+                </Text>
+              </View>
+              <ChevronRight color={colors.muted} size={20} />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.togglesCard}>
+            <TouchableOpacity style={styles.toggleRow}>
+              <View style={[styles.actionIcon, {backgroundColor: 'rgba(255, 69, 58, 0.1)'}]}>
+                <Trash2 color={colors.red} size={20} />
+              </View>
+              <View style={styles.actionTexts}>
+                <Text style={[styles.actionTitle, {color: colors.red}]}>Purge Local Enclave</Text>
+                <Text style={styles.actionSubtitle}>Instant zeroization of ephemeral caches</Text>
+              </View>
+              <AlertTriangle color={colors.red} size={20} />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.toggleRow, {borderBottomWidth: 0}]} onPress={handleLogout}>
-            <View style={[styles.actionIcon, {backgroundColor: 'rgba(255, 69, 58, 0.1)'}]}>
-              <LogOut color={colors.red} size={20} />
-            </View>
-            <View style={styles.actionTexts}>
-              <Text style={[styles.actionTitle, {color: colors.red}]}>Logout</Text>
-              <Text style={styles.actionSubtitle}>Disconnect from current session</Text>
-            </View>
-            <ChevronRight color={colors.red} size={20} />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity style={[styles.toggleRow, {borderBottomWidth: 0}]} onPress={handleLogout}>
+              <View style={[styles.actionIcon, {backgroundColor: 'rgba(255, 69, 58, 0.1)'}]}>
+                <LogOut color={colors.red} size={20} />
+              </View>
+              <View style={styles.actionTexts}>
+                <Text style={[styles.actionTitle, {color: colors.red}]}>Logout</Text>
+                <Text style={styles.actionSubtitle}>Disconnect from current session</Text>
+              </View>
+              <ChevronRight color={colors.red} size={20} />
+            </TouchableOpacity>
+          </View>
+        )}
 
 
 
