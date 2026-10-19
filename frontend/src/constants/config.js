@@ -14,7 +14,7 @@ const getBackendHost = () => {
   }
 
   // 4. Fallback to current local machine IP
-  return '192.168.1.240';
+  return '192.168.1.217';
 };
 
 const host = getBackendHost();

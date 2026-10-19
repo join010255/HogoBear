@@ -1,32 +1,50 @@
-import util from "tweetnacl-util";
+import forge from "node-forge";
 
+// Decrypts payload using AES-256-GCM and verifies authenticity
+export async function decryptMessage(encryptedPayload, sharedKeyBytes) {
+  try {
+    if (!encryptedPayload || !sharedKeyBytes) return null;
 
-export async function decryptMessage(encryptedPayloade, sharedKeyBytes){
-    try{
-        const  {iv, ciphertext} = encryptedPayloade;
+    
+    console.log(encryptedPayload.nonce)
+    const ivB64 = encryptedPayload.iv || encryptedPayload.nonce;
+    const ciphertextB64 = encryptedPayload.ciphertext;
+    const tagB64 = encryptedPayload.tag;
 
-        const ivBytes = util.decodeBase64(iv);
-        const cipherBytes = util.decodeBase64(ciphertext);
-
-        const cryptoKey = await crypto.subtle.importKey(
-            "raw",
-            sharedKeyBytes,
-            {name: "AES-GCM"},
-            false,
-            ["decrypt"]
-        );
-
-        const decryptBuffer = await crypto.subtle.decrypt(
-            {
-                name : "AES-GCM",
-                iv: ivBytes
-            },
-            cryptoKey,
-            cipherBytes
-        );
-
-        return new TextDecoder().decode(decryptBuffer);
-    }catch(error){
-        console.error("Decryption error (message altered or wrong key):", error);
+    if (!ivB64 || !ciphertextB64) {
+      return typeof encryptedPayload === "string" ? encryptedPayload : "";
     }
+
+    const keyBinary = forge.util.binary.raw.encode(sharedKeyBytes);
+    const ivBinary = forge.util.decode64(ivB64);
+    let cipherBinary = forge.util.decode64(ciphertextB64);
+    let tagBinary = tagB64 ? forge.util.decode64(tagB64) : null;
+
+    // Support combined ciphertext + tag if tag wasn't passed separately
+    if (!tagBinary && cipherBinary.length > 16) {
+      tagBinary = cipherBinary.slice(-16);
+      cipherBinary = cipherBinary.slice(0, -16);
+    }
+
+    const decipher = forge.cipher.createDecipher("AES-GCM", keyBinary);
+    decipher.start({
+      iv: ivBinary,
+      tagLength: 128,
+      tag: tagBinary ? forge.util.createBuffer(tagBinary) : undefined,
+    });
+    decipher.update(forge.util.createBuffer(cipherBinary));
+
+    const pass = decipher.finish();
+    if (!pass) {
+      console.error("Decryption failed: Authentication tag mismatch or corrupted data");
+      return "[⚠️ Could not decrypt message]";
+    }
+
+    return decipher.output.toString("utf8");
+  } catch (error) {
+    console.error("Decryption error (AES-GCM):", error);
+    return "[⚠️ Decryption error]";
+  }
 }
+
+export default decryptMessage;

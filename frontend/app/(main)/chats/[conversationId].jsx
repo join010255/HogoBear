@@ -51,13 +51,19 @@ export default function ConversationScreen() {
         }));
       }
     },
-    onReceiveMessage: async(msg) => {
-      const decryptText = await decryptMessage(
-        msg.payload, shareKey
-      );
+    onReceiveMessage: async (msg) => {
+      let decryptText = "";
+      if (shareKey && msg.payload) {
+        
+        
+        decryptText = await decryptMessage(msg.payload, shareKey);
+      } else if (typeof msg.payload === "string") {
+        decryptText = msg.payload;
+      }
+
       const receivedMsg = {
         id: msg.messageId || msg.tempId || Date.now().toString(),
-        text: decryptText,
+        text: decryptText || "[Message]",
         type: 'received',
         time: new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
@@ -73,27 +79,31 @@ export default function ConversationScreen() {
     },
   });
 
-  const handleSendMessage = async() => {
-    if (!inputText.trim() || !isOnline || !friend?.id) {
-      return
-    };
+  const handleSendMessage = async () => {
+    const plain = inputText.trim();
+    if (!plain || !isOnline || !friend?.id || !shareKey) {
+      return;
+    }
 
     const tempId = Date.now().toString();
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const cipherPayloade = await encryptionMess(
-      inputText.trim(), shareKey
-    );
 
-    const newMsg = {
-      id: tempId,
-      text: cipherPayloade,
-      type: 'sent',
-      time: timeNow,
-    };
-    setMessages((prev) => [...prev, newMsg]);
+    try {
+      const cipherPayloade = await encryptionMess(plain, shareKey);
 
-    sendMessage(tempId, friend.id, cipherPayloade);
-    setInputText('');
+      const newMsg = {
+        id: tempId,
+        text: plain,
+        type: 'sent',
+        time: timeNow,
+      };
+      setMessages((prev) => [...prev, newMsg]);
+
+      sendMessage(tempId, friend.id, cipherPayloade);
+      setInputText('');
+    } catch (err) {
+      console.error("Failed to encrypt and send message:", err);
+    }
   };
 
   const renderMessage = ({ item }) => {
