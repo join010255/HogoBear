@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingVi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons, Feather } from '@expo/vector-icons';
-import ConversationApi from '../../../src/api/conversations.api';
+// import ConversationApi from '../../../src/api/conversations.api';
 import { useAuthStore } from '../../../src/store/authStore';
 import UserStore from '../../../src/store/userStore';
 import { useChatSocket } from '../../../src/hooks/useChatSocket';
 import Keys from "../../../src/crypto/keys"
-
+import {encryptionMess} from "../../../src/crypto/encrypt"
+import { decryptMessage } from '../../../src/crypto/decrypt';
 
 export default function ConversationScreen() {
   const router = useRouter();
@@ -50,10 +51,13 @@ export default function ConversationScreen() {
         }));
       }
     },
-    onReceiveMessage: (msg) => {
+    onReceiveMessage: async(msg) => {
+      const decryptText = await decryptMessage(
+        msg.payload, shareKey
+      );
       const receivedMsg = {
         id: msg.messageId || msg.tempId || Date.now().toString(),
-        text: typeof msg.payload === 'string' ? msg.payload : msg.payload?.text,
+        text: decryptText,
         type: 'received',
         time: new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
@@ -69,21 +73,26 @@ export default function ConversationScreen() {
     },
   });
 
-  const handleSendMessage = () => {
-    if (!inputText.trim() || !isOnline || !friend?.id) return;
+  const handleSendMessage = async() => {
+    if (!inputText.trim() || !isOnline || !friend?.id) {
+      return
+    };
 
     const tempId = Date.now().toString();
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const cipherPayloade = await encryptionMess(
+      inputText.trim(), shareKey
+    );
 
     const newMsg = {
       id: tempId,
-      text: inputText.trim(),
+      text: cipherPayloade,
       type: 'sent',
       time: timeNow,
     };
     setMessages((prev) => [...prev, newMsg]);
 
-    sendMessage(tempId, friend.id, inputText.trim());
+    sendMessage(tempId, friend.id, cipherPayloade);
     setInputText('');
   };
 
