@@ -8,7 +8,7 @@ export async function decryptMessage(encryptedPayload, sharedKeyBytes) {
     
     console.log(encryptedPayload.nonce)
     const ivB64 = encryptedPayload.iv || encryptedPayload.nonce;
-    const ciphertextB64 = encryptedPayload.ciphertext;
+    const ciphertextB64 = encryptedPayload.ciphertext || encryptedPayload.contant;
     const tagB64 = encryptedPayload.tag;
 
     if (!ivB64 || !ciphertextB64) {
