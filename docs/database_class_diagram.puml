@@ -1,0 +1,60 @@
+@startuml Database_Class_Diagram
+
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam shadowing false
+skinparam backgroundColor #121214
+
+skinparam defaultFontColor #ffffff
+skinparam defaultFontSize 12
+
+skinparam class {
+    BackgroundColor #18191d
+    ArrowColor #ffffff
+    BorderColor #ffffff
+    FontColor #ffffff
+}
+
+enum FriendStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+class Users {
+    + UUID id <<PK>>
+    + String tokenUser <<UK>>
+    + String username <<UK>>
+    + String publicKey
+    + String password
+    + String recovery_accout_text <<UK>>
+    + Boolean is_online
+    + DateTime createdAt
+    + DateTime updatedAt
+}
+
+class Friends {
+    + UUID id <<PK>>
+    + UUID user_id <<FK>>
+    + UUID friend_id <<FK>>
+    + Boolean is_blocked
+    + FriendStatus status
+    + DateTime createdAt
+    + DateTime updatedAt
+}
+
+class Conversation {
+    + UUID id <<PK>>
+    + UUID user_one <<FK>>
+    + UUID user_two <<FK>>
+    + DateTime createdAt
+    + DateTime updatedAt
+}
+
+' Relationships & Associations
+Users "1" *-- "0..*" Friends : "friends (user_id / friend_id)"
+Users "1" *-- "0..*" Conversation : "participates (user_one / user_two)"
+Friends "1" o-- "1" Conversation : "starts"
+Friends ..> FriendStatus : "references"
+
+@enduml

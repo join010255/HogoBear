@@ -54,6 +54,7 @@ export default function ChatsScreen() {
           if (newKeys.publicKey && newKeys.privateKey) {
             await AuthApi.updatesPublicKey(newKeys.publicKey);
           }
+          
           console.log("Public Key (generated):", newKeys.publicKey);
         } else {
           console.log("Public Key (existing):", currentPublicKey);

@@ -10,12 +10,14 @@ export const useChatSocket = ({
   onMessageSentAck,
   onMessageDelivered,
   onPresenceChange,
+  isOnline
 }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
     if (!token) return;
-
+    
+    // connect socket 
     socketRef.current = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],
@@ -40,14 +42,14 @@ export const useChatSocket = ({
     });
 
     socket.on('conversation:joined', (data) => {
-      console.log('Successfully joined conversation:',  );
+      console.log('Successfully joined conversation:');
       if (onPeerInfoLoaded && data?.peer) {
         onPeerInfoLoaded(data.peer);
       }
     });
 
     socket.on('receive_message', (message) => {
-      console.log('Received message:', message);
+      // console.log('Received message:', message);
       if (onReceiveMessage) onReceiveMessage(message);
     });
 
@@ -79,7 +81,7 @@ export const useChatSocket = ({
         socket.disconnect();
       }
     };
-  }, [token, conversationId]);
+  }, [token, conversationId, isOnline]);
 
   const sendMessage = useCallback((tempId, recipientId, payload) => {
     if (socketRef.current && conversationId) {
