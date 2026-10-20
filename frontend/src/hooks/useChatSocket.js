@@ -16,7 +16,8 @@ export const useChatSocket = ({
 
   useEffect(() => {
     if (!token) return;
-
+    
+    // connect socket 
     socketRef.current = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],

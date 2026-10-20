@@ -7,7 +7,7 @@ export async function encryptionMess(plainText, sharedKeyBytes) {
       throw new Error("Shared key is missing");
     }
 
-    // 1. Convert sharedKeyBytes (Uint8Array 32 bytes) to binary string
+    // Convert sharedKeyBytes (Uint8Array 32 bytes) to binary string
     const keyBinary = forge.util.binary.raw.encode(sharedKeyBytes);
 
     // 2. Generate random 12-byte IV for AES-GCM
